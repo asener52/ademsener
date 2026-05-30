@@ -4,9 +4,11 @@ import { Plus, Edit, Calendar, MapPin, Wifi, Users } from "lucide-react";
 import { DeleteEventButton } from "@/components/admin/delete-event-button";
 
 async function getEvents() {
-  const supabase = await createClient();
-  const { data } = await supabase.from("events").select("*").order("event_date", { ascending: true });
-  return data || [];
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.from("events").select("*").order("event_date", { ascending: true });
+    return data || [];
+  } catch { return []; }
 }
 
 const statusStyle: Record<string, { bg: string; color: string; label: string }> = {

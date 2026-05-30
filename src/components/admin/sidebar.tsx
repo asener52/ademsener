@@ -6,7 +6,6 @@ import {
   MapPin, LayoutDashboard, FileText, MessageSquare, User,
   LogOut, ChevronRight, Mail, Calendar, ClipboardList,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 const navGroups = [
@@ -39,8 +38,7 @@ export function AdminSidebar() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await fetch("/api/auth/logout", { method: "POST" });
     router.push("/admin/login");
     router.refresh();
   };

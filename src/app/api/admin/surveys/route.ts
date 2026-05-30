@@ -1,13 +1,13 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
+import { query } from "@/lib/db";
 
 export async function POST(request: Request) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const body = await request.json();
-  const { data, error } = await supabase.from("surveys").insert([body]).select().single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  return NextResponse.json({ survey: data }, { status: 201 });
+  if (!await getSession()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const b = await request.json();
+  await query(
+    "INSERT INTO surveys (title, description, questions, is_active, ends_at) VALUES (?, ?, ?, ?, ?)",
+    [b.title, b.description || null, JSON.stringify(b.questions || []), b.is_active ? 1 : 0, b.ends_at || null]
+  );
+  return NextResponse.json({ ok: true }, { status: 201 });
 }

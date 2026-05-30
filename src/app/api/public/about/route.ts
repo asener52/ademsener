@@ -1,8 +1,11 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { queryOne } from "@/lib/db";
 
 export async function GET() {
-  const supabase = await createClient();
-  const { data } = await supabase.from("about_info").select("*").limit(1).single();
-  return NextResponse.json({ about: data || null });
+  const about = await queryOne("SELECT * FROM about_info LIMIT 1");
+  if (about) {
+    about.skills = typeof about.skills === "string" ? JSON.parse(about.skills || "[]") : about.skills;
+    about.social_links = typeof about.social_links === "string" ? JSON.parse(about.social_links || "{}") : about.social_links;
+  }
+  return NextResponse.json({ about });
 }

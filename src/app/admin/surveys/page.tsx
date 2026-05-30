@@ -5,12 +5,14 @@ import { formatDate } from "@/lib/utils";
 import { DeleteSurveyButton } from "@/components/admin/delete-survey-button";
 
 async function getSurveys() {
-  const supabase = await createClient();
-  const { data: surveys } = await supabase.from("surveys").select("*").order("created_at", { ascending: false });
-  const { data: responseCounts } = await supabase.from("survey_responses").select("survey_id");
-  const countMap: Record<string, number> = {};
-  responseCounts?.forEach(r => { countMap[r.survey_id] = (countMap[r.survey_id] || 0) + 1; });
-  return (surveys || []).map(s => ({ ...s, responseCount: countMap[s.id] || 0 }));
+  try {
+    const supabase = await createClient();
+    const { data: surveys } = await supabase.from("surveys").select("*").order("created_at", { ascending: false });
+    const { data: responseCounts } = await supabase.from("survey_responses").select("survey_id");
+    const countMap: Record<string, number> = {};
+    responseCounts?.forEach(r => { countMap[r.survey_id] = (countMap[r.survey_id] || 0) + 1; });
+    return (surveys || []).map(s => ({ ...s, responseCount: countMap[s.id] || 0 }));
+  } catch { return []; }
 }
 
 export default async function SurveysPage() {

@@ -1,25 +1,22 @@
-import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
+import { query } from "@/lib/db";
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!await getSession()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const body = await request.json();
-  const { data, error } = await supabase.from("surveys").update(body).eq("id", id).select().single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  return NextResponse.json({ survey: data });
+  const b = await request.json();
+  await query(
+    "UPDATE surveys SET title=?, description=?, questions=?, is_active=?, ends_at=? WHERE id=?",
+    [b.title, b.description || null, JSON.stringify(b.questions || []), b.is_active ? 1 : 0, b.ends_at || null, id]
+  );
+  return NextResponse.json({ ok: true });
 }
 
 export async function DELETE(_: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!await getSession()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  await supabase.from("survey_responses").delete().eq("survey_id", id);
-  await supabase.from("surveys").delete().eq("id", id);
+  await query("DELETE FROM survey_responses WHERE survey_id = ?", [id]);
+  await query("DELETE FROM surveys WHERE id = ?", [id]);
   return NextResponse.json({ ok: true });
 }
