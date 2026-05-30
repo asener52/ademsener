@@ -1,23 +1,20 @@
 import { createClient } from "@/lib/supabase/server";
 import { AdminSidebar } from "@/components/admin/sidebar";
+import { AdminPageWrapper } from "@/components/admin/page-wrapper";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return (
-      <div className="min-h-screen" style={{ background: "linear-gradient(135deg,#f0fdf9 0%,#eff6ff 100%)" }}>
-        {children}
-      </div>
-    );
+    return <>{children}</>;
   }
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: "#f8fafc" }}>
+    <div className="admin-app">
       <AdminSidebar />
-      <main className="flex-1 overflow-y-auto">
-        {children}
+      <main className="admin-main">
+        <AdminPageWrapper>{children}</AdminPageWrapper>
       </main>
     </div>
   );

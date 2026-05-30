@@ -7,20 +7,20 @@ import { TogglePublishButton } from "@/components/admin/toggle-publish-button";
 
 async function getPosts(type?: string) {
   const supabase = await createClient();
-  let query = supabase.from("posts").select("*").order("created_at", { ascending: false });
-  if (type && type !== "all") query = query.eq("type", type);
-  const { data } = await query;
+  let q = supabase.from("posts").select("*").order("created_at", { ascending: false });
+  if (type && type !== "all") q = q.eq("type", type);
+  const { data } = await q;
   return data || [];
 }
 
 const tabs = [
-  { value: "all", label: "Tümü" },
-  { value: "article", label: "Makale" },
-  { value: "news", label: "Haber" },
+  { value: "all",          label: "Tümü" },
+  { value: "article",      label: "Makale" },
+  { value: "news",         label: "Haber" },
   { value: "announcement", label: "Duyuru" },
-  { value: "training", label: "Eğitim" },
-  { value: "project", label: "Proje" },
-  { value: "publication", label: "Yayın" },
+  { value: "training",     label: "Eğitim" },
+  { value: "project",      label: "Proje" },
+  { value: "publication",  label: "Yayın" },
 ];
 
 const typeChip: Record<string, { bg: string; color: string }> = {
@@ -38,90 +38,94 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
   const posts = await getPosts(activeType);
 
   return (
-    <div className="p-6 lg:p-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+    <div style={{ padding: 48 }}>
+      <div className="kicker">📝 İçerik Yönetimi</div>
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
-          <h1 className="text-2xl font-black" style={{ color: "#0f172a" }}>İçerik Yönetimi</h1>
-          <p className="text-sm mt-1" style={{ color: "#64748b" }}>{posts.length} içerik bulundu</p>
+          <h1 style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-1.5px", color: "var(--text)" }}>İçerikler</h1>
+          <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 4 }}>{posts.length} içerik bulundu</p>
         </div>
         <Link href="/admin/posts/new"
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-white text-sm font-semibold"
-          style={{ background: "linear-gradient(135deg,#1b9aaa,#4fb477)", boxShadow: "0 4px 14px rgba(27,154,170,0.28)" }}>
-          <Plus className="w-4 h-4" /> Yeni İçerik
+          style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 22px", borderRadius: 16, fontSize: 14, fontWeight: 800, textDecoration: "none", color: "#fff", background: "linear-gradient(135deg,var(--primary),var(--secondary))", boxShadow: "0 10px 24px rgba(27,154,170,0.28)" }}>
+          <Plus style={{ width: 16, height: 16 }} /> Yeni İçerik
         </Link>
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 mb-5">
-        {tabs.map((tab) => (
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 22 }}>
+        {tabs.map(tab => (
           <Link key={tab.value}
             href={tab.value === "all" ? "/admin/posts" : `/admin/posts?type=${tab.value}`}
-            className="px-4 py-2 rounded-xl text-sm font-semibold transition-all"
-            style={activeType === tab.value
-              ? { background: "linear-gradient(135deg,#1b9aaa,#4fb477)", color: "#ffffff", boxShadow: "0 3px 10px rgba(27,154,170,0.25)" }
-              : { background: "#ffffff", color: "#64748b", border: "1px solid #e2e8f0" }}>
+            style={{
+              padding: "9px 18px", borderRadius: 14, fontSize: 13, fontWeight: 700, textDecoration: "none",
+              ...(activeType === tab.value
+                ? { background: "linear-gradient(135deg,var(--primary),var(--secondary))", color: "#fff", boxShadow: "0 6px 16px rgba(27,154,170,0.25)" }
+                : { background: "rgba(255,255,255,0.76)", color: "var(--muted)", border: "1px solid rgba(255,255,255,0.86)", boxShadow: "0 4px 10px rgba(31,90,110,0.06)" }),
+            }}>
             {tab.label}
           </Link>
         ))}
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl overflow-hidden" style={{ background: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+      <div style={{ background: "rgba(255,255,255,0.76)", border: "1px solid rgba(255,255,255,0.86)", borderRadius: 24, overflow: "hidden", boxShadow: "0 14px 32px rgba(31,90,110,0.09)" }}>
         {posts.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-sm mb-3" style={{ color: "#94a3b8" }}>Bu kategoride içerik yok.</p>
-            <Link href="/admin/posts/new" className="inline-flex items-center gap-1 text-sm font-semibold" style={{ color: "#1b9aaa" }}>
-              <Plus className="w-4 h-4" /> İlk içeriği oluştur
+          <div style={{ textAlign: "center", padding: "64px 24px" }}>
+            <p style={{ color: "var(--muted)", marginBottom: 14, fontSize: 14 }}>Bu kategoride içerik yok.</p>
+            <Link href="/admin/posts/new" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "var(--primary)", textDecoration: "none" }}>
+              <Plus style={{ width: 14, height: 14 }} /> İlk içeriği oluştur
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr className="text-xs font-bold uppercase tracking-wider" style={{ borderBottom: "1px solid #f1f5f9", color: "#94a3b8" }}>
-                  <th className="text-left px-5 py-3">Başlık</th>
-                  <th className="text-left px-5 py-3">Tür</th>
-                  <th className="text-left px-5 py-3">Durum</th>
-                  <th className="text-left px-5 py-3">Görüntülenme</th>
-                  <th className="text-left px-5 py-3">Tarih</th>
-                  <th className="text-right px-5 py-3">İşlemler</th>
+                <tr style={{ borderBottom: "1px solid rgba(22,48,64,0.08)" }}>
+                  {["Başlık", "Tür", "Durum", "Görüntülenme", "Tarih", ""].map(h => (
+                    <th key={h} style={{ textAlign: h === "" ? "right" : "left", padding: "14px 20px", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--muted)" }}>{h}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {posts.map((post: any) => {
                   const chip = typeChip[post.type] || typeChip.article;
                   return (
-                    <tr key={post.id} className="transition-colors hover:bg-slate-50" style={{ borderBottom: "1px solid #f8fafc" }}>
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-2">
-                          {post.featured && <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 flex-shrink-0" />}
-                          <span className="text-sm font-semibold line-clamp-1 max-w-xs" style={{ color: "#334155" }}>{post.title}</span>
+                    <tr key={post.id} style={{ borderBottom: "1px solid rgba(22,48,64,0.05)", transition: "background 0.18s" }}
+                      onMouseEnter={e => (e.currentTarget.style.background = "rgba(27,154,170,0.03)")}
+                      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                      <td style={{ padding: "14px 20px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          {post.featured && <Star style={{ width: 13, height: 13, fill: "#f59e0b", color: "#f59e0b", flexShrink: 0 }} />}
+                          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 280 }}>{post.title}</span>
                         </div>
                       </td>
-                      <td className="px-5 py-4">
-                        <span className="text-xs px-2.5 py-1 rounded-full font-bold" style={{ background: chip.bg, color: chip.color }}>
+                      <td style={{ padding: "14px 20px" }}>
+                        <span style={{ fontSize: 11, fontWeight: 800, padding: "4px 10px", borderRadius: 8, background: chip.bg, color: chip.color }}>
                           {typeLabels[post.type] || post.type}
                         </span>
                       </td>
-                      <td className="px-5 py-4">
+                      <td style={{ padding: "14px 20px" }}>
                         <TogglePublishButton postId={post.id} published={post.published} />
                       </td>
-                      <td className="px-5 py-4">
-                        <span className="text-sm" style={{ color: "#64748b" }}>{post.view_count ?? 0}</span>
+                      <td style={{ padding: "14px 20px" }}>
+                        <span style={{ fontSize: 13, color: "var(--muted)" }}>{post.view_count ?? 0}</span>
                       </td>
-                      <td className="px-5 py-4">
-                        <span className="text-sm" style={{ color: "#94a3b8" }}>{formatDate(post.created_at)}</span>
+                      <td style={{ padding: "14px 20px" }}>
+                        <span style={{ fontSize: 12, color: "var(--muted)" }}>{formatDate(post.created_at)}</span>
                       </td>
-                      <td className="px-5 py-4">
-                        <div className="flex items-center justify-end gap-1">
+                      <td style={{ padding: "14px 20px" }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 4 }}>
                           <Link href={`/articles/${post.slug}`} target="_blank"
-                            className="p-1.5 rounded-lg transition-colors hover:bg-slate-100" style={{ color: "#94a3b8" }} title="Görüntüle">
-                            <Eye className="w-4 h-4" />
+                            style={{ padding: 6, borderRadius: 10, color: "var(--muted)", display: "grid", placeItems: "center", transition: "all 0.18s" }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(27,154,170,0.08)"; (e.currentTarget as HTMLElement).style.color = "var(--primary)"; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}>
+                            <Eye style={{ width: 15, height: 15 }} />
                           </Link>
                           <Link href={`/admin/posts/${post.id}`}
-                            className="p-1.5 rounded-lg transition-colors hover:bg-slate-100" style={{ color: "#94a3b8" }} title="Düzenle">
-                            <Edit className="w-4 h-4" />
+                            style={{ padding: 6, borderRadius: 10, color: "var(--muted)", display: "grid", placeItems: "center", transition: "all 0.18s" }}
+                            onMouseEnter={e => { e.currentTarget.style.background = "rgba(108,99,255,0.08)"; (e.currentTarget as HTMLElement).style.color = "var(--accent)"; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}>
+                            <Edit style={{ width: 15, height: 15 }} />
                           </Link>
                           <DeletePostButton postId={post.id} />
                         </div>

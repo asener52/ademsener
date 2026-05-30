@@ -8,46 +8,49 @@ export default async function NewsletterPage() {
     .from("newsletter_subscribers").select("*", { count: "exact" }).order("created_at", { ascending: false });
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-black" style={{ color: "#0f172a" }}>Bülten Aboneleri</h1>
-        <p className="text-sm mt-1" style={{ color: "#64748b" }}>{count} abone</p>
+    <div style={{ padding: 48 }}>
+      <div className="kicker">📬 Bülten</div>
+      <div style={{ marginBottom: 32 }}>
+        <h1 style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-1.5px", color: "var(--text)" }}>Aboneler</h1>
+        <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 4 }}>{count} e-posta abonesi</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="p-5 rounded-2xl" style={{ background: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: "rgba(27,154,170,0.10)" }}>
-            <Users className="w-5 h-5" style={{ color: "#1b9aaa" }} />
+      {/* Stat */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 28 }}>
+        <div style={{ padding: "22px 20px", background: "rgba(255,255,255,0.76)", border: "1px solid rgba(255,255,255,0.86)", borderRadius: 24, boxShadow: "0 10px 24px rgba(31,90,110,0.07)" }}>
+          <div style={{ width: 42, height: 42, borderRadius: 14, display: "grid", placeItems: "center", background: "rgba(27,154,170,0.10)", marginBottom: 14 }}>
+            <Users style={{ width: 20, height: 20, color: "var(--primary)" }} />
           </div>
-          <p className="text-2xl font-black" style={{ color: "#0f172a" }}>{count}</p>
-          <p className="text-sm mt-0.5" style={{ color: "#64748b" }}>Toplam Abone</p>
+          <p style={{ fontSize: 28, fontWeight: 900, color: "var(--text)", lineHeight: 1 }}>{count}</p>
+          <p style={{ fontSize: 13, color: "var(--muted)", marginTop: 4 }}>Toplam Abone</p>
         </div>
       </div>
 
-      <div className="rounded-2xl overflow-hidden" style={{ background: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
-        <div className="grid grid-cols-3 px-5 py-3 text-xs font-bold uppercase tracking-wider" style={{ borderBottom: "1px solid #f1f5f9", color: "#94a3b8" }}>
+      {/* Table */}
+      <div style={{ background: "rgba(255,255,255,0.76)", border: "1px solid rgba(255,255,255,0.86)", borderRadius: 24, overflow: "hidden", boxShadow: "0 14px 32px rgba(31,90,110,0.09)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: "14px 24px", borderBottom: "1px solid rgba(22,48,64,0.07)", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--muted)" }}>
           <span>E-posta</span>
-          <span>Tarih</span>
-          <span></span>
+          <span>Kayıt Tarihi</span>
         </div>
         <div>
           {subscribers?.map((sub) => (
-            <div key={sub.id} className="px-5 py-3 grid grid-cols-3 items-center hover:bg-slate-50 transition-colors" style={{ borderBottom: "1px solid #f8fafc" }}>
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 flex-shrink-0" style={{ color: "#94a3b8" }} />
-                <span className="text-sm font-medium" style={{ color: "#334155" }}>{sub.email}</span>
+            <div key={sub.id} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: "13px 24px", alignItems: "center", borderBottom: "1px solid rgba(22,48,64,0.04)", transition: "background 0.18s" }}
+              onMouseEnter={e => (e.currentTarget.style.background = "rgba(27,154,170,0.03)")}
+              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <Mail style={{ width: 15, height: 15, color: "var(--muted)", flexShrink: 0 }} />
+                <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{sub.email}</span>
               </div>
-              <div className="flex items-center gap-1.5 text-sm" style={{ color: "#94a3b8" }}>
-                <Calendar className="w-3.5 h-3.5" />
+              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--muted)" }}>
+                <Calendar style={{ width: 13, height: 13 }} />
                 {formatDate(sub.created_at)}
               </div>
-              <div></div>
             </div>
           ))}
           {(!subscribers || subscribers.length === 0) && (
-            <div className="text-center py-12">
-              <Mail className="w-8 h-8 mx-auto mb-2" style={{ color: "#e2e8f0" }} />
-              <p className="text-sm" style={{ color: "#94a3b8" }}>Henüz abone yok.</p>
+            <div style={{ textAlign: "center", padding: "48px 24px" }}>
+              <Mail style={{ width: 36, height: 36, color: "rgba(22,48,64,0.12)", margin: "0 auto 10px" }} />
+              <p style={{ fontSize: 13, color: "var(--muted)" }}>Henüz abone yok.</p>
             </div>
           )}
         </div>

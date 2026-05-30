@@ -14,55 +14,54 @@ export default async function MessagesPage() {
   const unread = messages.filter(m => !m.read).length;
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-black flex items-center gap-3" style={{ color: "#0f172a" }}>
+    <div style={{ padding: 48 }}>
+      <div className="kicker">✉️ Gelen Kutusu</div>
+      <div style={{ marginBottom: 32 }}>
+        <h1 style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-1.5px", color: "var(--text)", display: "flex", alignItems: "center", gap: 12 }}>
           Mesajlar
           {unread > 0 && (
-            <span className="text-sm px-2.5 py-0.5 rounded-full font-bold" style={{ background: "rgba(239,68,68,0.12)", color: "#ef4444" }}>
+            <span style={{ fontSize: 14, fontWeight: 800, padding: "4px 12px", borderRadius: 10, background: "rgba(239,68,68,0.12)", color: "#ef4444" }}>
               {unread} yeni
             </span>
           )}
         </h1>
-        <p className="text-sm mt-1" style={{ color: "#64748b" }}>{messages.length} mesaj</p>
+        <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 4 }}>{messages.length} mesaj</p>
       </div>
 
-      <div className="space-y-3">
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {messages.length === 0 ? (
-          <div className="text-center py-16 rounded-2xl" style={{ background: "#ffffff", border: "1px solid #e2e8f0" }}>
-            <MessageSquare className="w-10 h-10 mx-auto mb-3" style={{ color: "#cbd5e1" }} />
-            <p style={{ color: "#94a3b8" }}>Henüz mesaj yok.</p>
+          <div style={{ textAlign: "center", padding: "64px 24px", background: "rgba(255,255,255,0.76)", border: "1px solid rgba(255,255,255,0.86)", borderRadius: 24, boxShadow: "0 12px 28px rgba(31,90,110,0.08)" }}>
+            <MessageSquare style={{ width: 40, height: 40, color: "rgba(22,48,64,0.15)", margin: "0 auto 12px" }} />
+            <p style={{ color: "var(--muted)" }}>Henüz mesaj yok.</p>
           </div>
-        ) : (
-          messages.map((msg) => (
-            <div key={msg.id} className="p-5 rounded-2xl transition-all"
-              style={{
-                background: !msg.read ? "rgba(27,154,170,0.04)" : "#ffffff",
-                border: !msg.read ? "1px solid rgba(27,154,170,0.20)" : "1px solid #e2e8f0",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-              }}>
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    {!msg.read && <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: "#1b9aaa" }} />}
-                    <h3 className="font-bold" style={{ color: "#0f172a" }}>{msg.name}</h3>
-                    <span style={{ color: "#cbd5e1" }}>·</span>
-                    <span className="text-xs flex items-center gap-1" style={{ color: "#94a3b8" }}>
-                      <Mail className="w-3 h-3" /> {msg.email}
-                    </span>
-                  </div>
-                  <p className="text-sm font-semibold mb-2" style={{ color: "#1b9aaa" }}>{msg.subject}</p>
-                  <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: "#64748b" }}>{msg.body}</p>
-                  <div className="flex items-center gap-1.5 mt-3 text-xs" style={{ color: "#94a3b8" }}>
-                    <Calendar className="w-3 h-3" />
-                    {formatDate(msg.created_at)}
-                  </div>
+        ) : messages.map((msg) => (
+          <div key={msg.id} style={{
+            padding: "22px 24px", borderRadius: 22, transition: "transform 0.22s ease",
+            background: !msg.read ? "rgba(27,154,170,0.04)" : "rgba(255,255,255,0.76)",
+            border: !msg.read ? "1px solid rgba(27,154,170,0.18)" : "1px solid rgba(255,255,255,0.86)",
+            boxShadow: "0 10px 24px rgba(31,90,110,0.07)",
+          }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                  {!msg.read && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--primary)", flexShrink: 0 }} />}
+                  <h3 style={{ fontWeight: 800, fontSize: 15, color: "var(--text)" }}>{msg.name}</h3>
+                  <span style={{ color: "rgba(22,48,64,0.20)" }}>·</span>
+                  <span style={{ fontSize: 12, color: "var(--muted)", display: "flex", alignItems: "center", gap: 4 }}>
+                    <Mail style={{ width: 12, height: 12 }} /> {msg.email}
+                  </span>
                 </div>
-                {!msg.read && <MarkReadButton messageId={msg.id} />}
+                <p style={{ fontSize: 14, fontWeight: 700, color: "var(--primary)", marginBottom: 10 }}>{msg.subject}</p>
+                <p style={{ fontSize: 14, color: "var(--muted)", lineHeight: 1.7, whiteSpace: "pre-line" }}>{msg.body}</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 12, fontSize: 12, color: "var(--muted)" }}>
+                  <Calendar style={{ width: 12, height: 12 }} />
+                  {formatDate(msg.created_at)}
+                </div>
               </div>
+              {!msg.read && <MarkReadButton messageId={msg.id} />}
             </div>
-          ))
-        )}
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -6,10 +6,11 @@ export default async function AdminAboutPage() {
   const { data: about } = await supabase.from("about_info").select("*").limit(1).single();
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-black" style={{ color: "#0f172a" }}>Hakkımda Düzenle</h1>
-        <p className="text-sm mt-1" style={{ color: "#64748b" }}>Kişisel bilgilerinizi güncelleyin</p>
+    <div style={{ padding: 48 }}>
+      <div className="kicker">👤 Profil</div>
+      <div style={{ marginBottom: 32 }}>
+        <h1 style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-1.5px", color: "var(--text)" }}>Hakkımda Düzenle</h1>
+        <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 4 }}>Kişisel bilgilerinizi güncelleyin</p>
       </div>
       <AboutEditor about={about} />
     </div>

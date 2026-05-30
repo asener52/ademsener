@@ -46,73 +46,101 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside
-      className="w-64 flex-shrink-0 flex flex-col h-screen sticky top-0"
-      style={{ background: "#ffffff", borderRight: "1px solid #e2e8f0" }}
-    >
-      {/* Logo */}
-      <div className="p-5" style={{ borderBottom: "1px solid #e2e8f0" }}>
-        <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 rounded-2xl flex items-center justify-center text-white flex-shrink-0"
-            style={{ background: "linear-gradient(135deg,#1b9aaa,#4fb477)", boxShadow: "0 6px 16px rgba(27,154,170,0.28)" }}
-          >
-            <MapPin className="w-5 h-5" strokeWidth={2.5} />
-          </div>
-          <div>
-            <p className="text-sm font-black" style={{ color: "#0f172a" }}>Admin Panel</p>
-            <p className="text-xs font-semibold" style={{ color: "#1b9aaa" }}>Adem ŞENER</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-4 overflow-y-auto space-y-5">
-        {navGroups.map((group) => (
-          <div key={group.label}>
-            <p className="text-[10px] font-black uppercase tracking-widest px-3 mb-2" style={{ color: "#94a3b8" }}>
-              {group.label}
-            </p>
-            <div className="space-y-0.5">
-              {group.items.map(({ href, label, icon: Icon }) => {
-                const active = pathname === href || pathname.startsWith(href + "/");
-                return (
-                  <Link
-                    key={href}
-                    href={href}
-                    className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200",
-                      active
-                        ? "border"
-                        : "hover:bg-slate-50"
-                    )}
-                    style={active ? {
-                      background: "rgba(27,154,170,0.08)",
-                      borderColor: "rgba(27,154,170,0.20)",
-                      color: "#1b9aaa",
-                    } : { color: "#64748b" }}
-                  >
-                    <Icon className="w-4 h-4 flex-shrink-0" />
-                    <span className="flex-1">{label}</span>
-                    {active && <ChevronRight className="w-3 h-3 opacity-50" />}
-                  </Link>
-                );
-              })}
+    <aside className="admin-aside">
+      {/* Brand */}
+      <div>
+        <div style={{ padding: "24px 24px 20px", borderBottom: "1px solid var(--border)" }}>
+          <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+            <div style={{
+              width: 54, height: 54, borderRadius: 18, display: "grid", placeItems: "center",
+              color: "white", background: "linear-gradient(135deg,var(--primary),var(--secondary))",
+              boxShadow: "0 14px 32px rgba(27,154,170,0.28)", flexShrink: 0,
+            }}>
+              <MapPin style={{ width: 24, height: 24, strokeWidth: 2.5 }} />
+            </div>
+            <div>
+              <p style={{ fontWeight: 800, fontSize: 15, color: "var(--text)", lineHeight: 1.2 }}>Admin Panel</p>
+              <p style={{ fontSize: 11, color: "var(--primary)", fontWeight: 700, marginTop: 3 }}>Adem ŞENER</p>
             </div>
           </div>
-        ))}
-      </nav>
+        </div>
+
+        {/* Nav */}
+        <nav style={{ padding: "16px 12px", flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 20 }}>
+          {navGroups.map((group) => (
+            <div key={group.label}>
+              <p style={{
+                fontSize: 10, fontWeight: 800, textTransform: "uppercase",
+                letterSpacing: "0.10em", color: "var(--muted)", padding: "0 8px", marginBottom: 6,
+              }}>
+                {group.label}
+              </p>
+              <div style={{ display: "grid", gap: 3 }}>
+                {group.items.map(({ href, label, icon: Icon }) => {
+                  const active = pathname === href || pathname.startsWith(href + "/");
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      style={{
+                        display: "flex", alignItems: "center", gap: 10,
+                        padding: "12px 14px", borderRadius: 16,
+                        fontSize: 14, fontWeight: 700, textDecoration: "none",
+                        transition: "all 0.25s ease",
+                        ...(active ? {
+                          background: "rgba(255,255,255,0.82)",
+                          boxShadow: "0 10px 24px rgba(31,90,110,0.10)",
+                          color: "var(--primary)",
+                          transform: "translateX(4px)",
+                        } : {
+                          background: "transparent",
+                          color: "var(--muted)",
+                        }),
+                      }}
+                    >
+                      <Icon style={{ width: 17, height: 17, flexShrink: 0 }} />
+                      <span style={{ flex: 1 }}>{label}</span>
+                      {active && <ChevronRight style={{ width: 13, height: 13, opacity: 0.6 }} />}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </nav>
+      </div>
 
       {/* Footer */}
-      <div className="p-3" style={{ borderTop: "1px solid #e2e8f0" }}>
+      <div style={{ padding: "12px", borderTop: "1px solid var(--border)" }}>
+        <div style={{
+          padding: "14px 16px", borderRadius: 20,
+          background: "linear-gradient(135deg,rgba(27,154,170,0.10),rgba(108,99,255,0.08))",
+          border: "1px solid rgba(255,255,255,0.60)",
+          marginBottom: 8,
+        }}>
+          <p style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em", color: "var(--primary)", marginBottom: 4 }}>Kurum</p>
+          <p style={{ fontSize: 12, fontWeight: 700, color: "var(--text)", lineHeight: 1.4 }}>Ünye Belediyesi Bilgi İşlem</p>
+        </div>
+
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 hover:bg-red-50"
-          style={{ color: "#94a3b8" }}
-          onMouseEnter={e => (e.currentTarget.style.color = "#ef4444")}
-          onMouseLeave={e => (e.currentTarget.style.color = "#94a3b8")}
+          style={{
+            width: "100%", display: "flex", alignItems: "center", gap: 10,
+            padding: "11px 14px", borderRadius: 14, border: 0, cursor: "pointer",
+            fontSize: 13, fontWeight: 700, background: "transparent",
+            color: "var(--muted)", fontFamily: "inherit",
+            transition: "all 0.22s ease",
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = "rgba(239,68,68,0.08)";
+            e.currentTarget.style.color = "#ef4444";
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = "transparent";
+            e.currentTarget.style.color = "var(--muted)";
+          }}
         >
-          <LogOut className="w-4 h-4" />
+          <LogOut style={{ width: 16, height: 16 }} />
           Çıkış Yap
         </button>
       </div>

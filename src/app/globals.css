@@ -455,6 +455,52 @@ body {
 .prose-content code { background: rgba(27,154,170,0.10); color: #0e7682; padding: 0.15em 0.4em; border-radius: 0.3rem; font-size: 0.875em; }
 .prose-content pre { background: #f0f8fb; border: 1px solid var(--border); padding: 1.25rem; border-radius: 0.75rem; overflow-x: auto; margin: 1.5rem 0; }
 
+/* ── Admin Page Transition ── */
+@keyframes adminPageIn {
+  from { opacity: 0; transform: translateX(42px) scale(0.985); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.admin-page-enter {
+  animation: adminPageIn 0.45s ease forwards;
+}
+
+/* ── Admin App Shell ── */
+.admin-app {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  padding: 22px;
+  gap: 22px;
+  overflow: hidden;
+}
+
+.admin-aside {
+  position: sticky;
+  top: 22px;
+  height: calc(100vh - 44px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-main {
+  position: relative;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.42);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+  min-height: calc(100vh - 44px);
+  overflow-y: auto;
+}
+
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
