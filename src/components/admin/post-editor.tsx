@@ -191,6 +191,8 @@ export function PostEditor({ post, mode }: PostEditorProps) {
                 { value: "news", label: "Son Gelişme" },
                 { value: "announcement", label: "Duyuru" },
                 { value: "training", label: "Eğitim" },
+                { value: "project", label: "Proje" },
+                { value: "publication", label: "Yayın" },
               ].map(({ value, label }) => (
                 <label key={value} className="flex items-center gap-2.5 cursor-pointer">
                   <div

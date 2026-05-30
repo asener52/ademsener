@@ -1,4 +1,4 @@
-export type ContentType = 'article' | 'news' | 'announcement' | 'training'
+export type ContentType = 'article' | 'news' | 'announcement' | 'training' | 'project' | 'publication'
 
 export interface Post {
   id: string
