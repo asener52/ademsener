@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, MapPin, Send, CheckCircle, AlertCircle, Clock, MessageSquare } from "lucide-react";
+import { CheckCircle, AlertCircle, Send } from "lucide-react";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", body: "" });
@@ -21,136 +21,148 @@ export default function ContactPage() {
     } catch { setStatus("error"); }
   };
 
+  const inputStyle: React.CSSProperties = {
+    width: "100%",
+    border: "1px solid var(--border)",
+    background: "rgba(255,255,255,0.86)",
+    borderRadius: "16px",
+    padding: "15px 16px",
+    fontFamily: "inherit",
+    fontSize: "14px",
+    color: "var(--text)",
+    outline: "none",
+    transition: "border-color 0.2s",
+  };
+
   return (
-    <div className="bg-slate-950 min-h-screen py-28">
-      {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-14">
-        <div className="text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-bold uppercase tracking-widest mb-6">
-            <Mail className="w-3.5 h-3.5" /> İletişim
-          </div>
-          <h1 className="text-5xl sm:text-6xl font-black text-white mb-4">Bana Ulaşın</h1>
-          <p className="text-slate-500 max-w-xl mx-auto leading-relaxed">
-            CBS projeleri, yazılım geliştirme veya herhangi bir iş birliği için mesaj gönderebilirsiniz.
+    <div className="p-[58px]">
+      <div className="kicker">📬 İletişim</div>
+
+      <h2 style={{
+        fontSize: "clamp(32px, 4vw, 54px)",
+        lineHeight: 1.05,
+        letterSpacing: "-2px",
+        fontWeight: 900,
+        marginBottom: "40px",
+        color: "var(--text)",
+      }}>
+        Harita tabanlı bir fikri<br />
+        <span className="gradient-text">güçlü bir ürüne dönüştürelim.</span>
+      </h2>
+
+      <div style={{ display: "grid", gridTemplateColumns: "0.85fr 1.15fr", gap: "24px", alignItems: "stretch" }}>
+        {/* Info */}
+        <div
+          className="p-7"
+          style={{ borderRadius: "30px", background: "rgba(255,255,255,0.78)", border: "1px solid rgba(255,255,255,0.88)", boxShadow: "0 18px 42px rgba(31,90,110,0.10)" }}
+        >
+          <h3 className="text-[22px] font-bold mb-3" style={{ color: "var(--text)" }}>Bir proje konuşalım</h3>
+          <p className="text-[14px] leading-relaxed mb-6" style={{ color: "var(--muted)" }}>
+            Web CBS, belediye uygulamaları, drone verisi, 3D model görüntüleme veya kurumsal yazılım geliştirme konularında iletişime geçebilirsiniz.
           </p>
+
+          {[
+            { icon: "📧", label: "E-posta", val: "iletisim@ademsener.org" },
+            { icon: "🌐", label: "Web", val: "ademsener.org" },
+            { icon: "📍", label: "Konum", val: "Ünye / Ordu" },
+            { icon: "⏱️", label: "Yanıt", val: "24 saat içinde" },
+          ].map(({ icon, label, val }) => (
+            <div key={label} className="flex items-center gap-3 py-3.5" style={{ borderTop: "1px solid var(--border)" }}>
+              <span className="text-lg">{icon}</span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--muted)" }}>{label}</p>
+                <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{val}</p>
+              </div>
+            </div>
+          ))}
+
+          {/* Expertise tags */}
+          <div className="mt-5">
+            <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: "var(--primary)" }}>Çalışma Konuları</p>
+            <div className="flex flex-wrap gap-2">
+              {["CBS / GIS", "WebGIS", "Belediye", "Drone", "3D Model", "Yazılım"].map((t) => (
+                <span key={t} className="tag">{t}</span>
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {/* Form */}
+        <div
+          className="p-7"
+          style={{ borderRadius: "30px", background: "rgba(255,255,255,0.78)", border: "1px solid rgba(255,255,255,0.88)", boxShadow: "0 18px 42px rgba(31,90,110,0.10)" }}
+        >
+          <h3 className="text-[22px] font-bold mb-6" style={{ color: "var(--text)" }}>Mesaj gönder</h3>
 
-          {/* Info panel */}
-          <div className="lg:col-span-2 space-y-4">
-            {[
-              { icon: MapPin, title: "Konum", value: "Ünye Belediyesi\nBilgi İşlem Müdürlüğü\nOrdu, Türkiye", color: "sky" },
-              { icon: Mail, title: "E-posta", value: "iletisim@ademsener.org", color: "violet" },
-              { icon: Clock, title: "Yanıt Süresi", value: "Genellikle 24 saat\niçinde yanıt veririm.", color: "emerald" },
-              { icon: MessageSquare, title: "Çalışma Konuları", value: "CBS, GIS, WebGIS\nYazılım Geliştirme\nMekansal Analiz", color: "amber" },
-            ].map(({ icon: Icon, title, value, color }) => (
-              <div key={title} className="flex gap-4 p-5 rounded-2xl bg-slate-900/80 border border-white/6 hover:border-white/10 transition-all group">
-                <div className={`flex-shrink-0 w-10 h-10 rounded-xl bg-${color}-500/10 border border-${color}-500/20 flex items-center justify-center group-hover:scale-105 transition-transform`}>
-                  <Icon className={`w-5 h-5 text-${color}-400`} />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-600 uppercase tracking-widest mb-1">{title}</p>
-                  <p className="text-sm text-slate-400 whitespace-pre-line leading-relaxed">{value}</p>
-                </div>
+          {status === "success" ? (
+            <div className="flex flex-col items-center justify-center py-14 text-center">
+              <div className="w-16 h-16 rounded-3xl flex items-center justify-center mb-5 text-3xl" style={{ background: "rgba(79,180,119,0.15)" }}>
+                ✅
               </div>
-            ))}
-
-            {/* CTA card */}
-            <div className="relative rounded-2xl overflow-hidden p-6 bg-gradient-to-br from-sky-600/20 to-violet-600/20 border border-white/10">
-              <div className="absolute inset-0 map-grid opacity-20" />
-              <div className="relative">
-                <MapPin className="w-8 h-8 text-sky-400 mb-3" />
-                <h3 className="font-bold text-white mb-2">CBS Projeleri</h3>
-                <p className="text-sm text-slate-400 leading-relaxed">
-                  Coğrafi Bilgi Sistemleri, WebGIS ve mekansal analiz konularında danışmanlık için iletişime geçebilirsiniz.
-                </p>
-              </div>
+              <h3 className="text-lg font-bold mb-2" style={{ color: "var(--text)" }}>Mesajınız İletildi!</h3>
+              <p className="text-sm mb-6" style={{ color: "var(--muted)" }}>En kısa sürede size geri dönüş yapacağım.</p>
+              <button
+                onClick={() => setStatus("idle")}
+                className="font-bold text-sm text-white transition-all hover:-translate-y-1"
+                style={{ padding: "12px 24px", borderRadius: "14px", background: "linear-gradient(135deg, #1b9aaa, #4fb477)", border: "none", cursor: "pointer" }}
+              >
+                Yeni Mesaj
+              </button>
             </div>
-          </div>
+          ) : (
+            <form onSubmit={handleSubmit} style={{ display: "grid", gap: "14px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                <input
+                  type="text" required placeholder="Ad Soyad"
+                  value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  style={inputStyle}
+                />
+                <input
+                  type="email" required placeholder="E-posta"
+                  value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  style={inputStyle}
+                />
+              </div>
+              <input
+                type="text" required placeholder="Konu"
+                value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                style={inputStyle}
+              />
+              <textarea
+                required placeholder="Projenizden kısaca bahsedin..."
+                rows={6} value={form.body}
+                onChange={(e) => setForm({ ...form, body: e.target.value })}
+                style={{ ...inputStyle, resize: "vertical", minHeight: "130px" }}
+              />
 
-          {/* Form */}
-          <div className="lg:col-span-3">
-            <div className="p-8 rounded-2xl bg-slate-900/80 border border-white/6">
-              <h2 className="text-xl font-bold text-white mb-6">Mesaj Gönder</h2>
-
-              {status === "success" ? (
-                <div className="flex flex-col items-center justify-center py-14 text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-5">
-                    <CheckCircle className="w-8 h-8 text-emerald-400" />
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-2">Mesajınız İletildi!</h3>
-                  <p className="text-slate-500 text-sm mb-6">En kısa sürede size geri dönüş yapacağım.</p>
-                  <button onClick={() => setStatus("idle")} className="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm transition-colors">
-                    Yeni Mesaj
-                  </button>
+              {status === "error" && (
+                <div className="flex items-center gap-2.5 p-3 rounded-2xl" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.20)", color: "#dc2626", fontSize: 14 }}>
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  Mesaj gönderilemedi. Lütfen tekrar deneyin.
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Ad Soyad *</label>
-                      <input
-                        type="text" required value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-white/4 border border-white/8 hover:border-white/12 focus:border-sky-500/50 text-white placeholder-slate-600 text-sm focus:outline-none transition-all"
-                        placeholder="Adınız Soyadınız"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">E-posta *</label>
-                      <input
-                        type="email" required value={form.email}
-                        onChange={(e) => setForm({ ...form, email: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-white/4 border border-white/8 hover:border-white/12 focus:border-sky-500/50 text-white placeholder-slate-600 text-sm focus:outline-none transition-all"
-                        placeholder="ornek@email.com"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Konu *</label>
-                    <input
-                      type="text" required value={form.subject}
-                      onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-white/4 border border-white/8 hover:border-white/12 focus:border-sky-500/50 text-white placeholder-slate-600 text-sm focus:outline-none transition-all"
-                      placeholder="Mesajınızın konusu"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Mesaj *</label>
-                    <textarea
-                      required rows={7} value={form.body}
-                      onChange={(e) => setForm({ ...form, body: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl bg-white/4 border border-white/8 hover:border-white/12 focus:border-sky-500/50 text-white placeholder-slate-600 text-sm focus:outline-none transition-all resize-none"
-                      placeholder="Mesajınızı buraya yazın..."
-                    />
-                  </div>
-
-                  {status === "error" && (
-                    <div className="flex items-center gap-2.5 text-red-400 text-sm bg-red-500/8 border border-red-500/20 rounded-xl px-4 py-3">
-                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                      Mesaj gönderilirken bir hata oluştu. Lütfen tekrar deneyin.
-                    </div>
-                  )}
-
-                  <button
-                    type="submit" disabled={status === "loading"}
-                    className="w-full flex items-center justify-center gap-2.5 px-6 py-4 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 disabled:opacity-50 text-white font-bold text-sm transition-all shadow-lg shadow-sky-500/20 hover:shadow-sky-500/30 hover:-translate-y-0.5"
-                  >
-                    {status === "loading" ? (
-                      <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Gönderiliyor...</>
-                    ) : (
-                      <><Send className="w-4 h-4" />Mesaj Gönder</>
-                    )}
-                  </button>
-                </form>
               )}
-            </div>
-          </div>
+
+              <button
+                type="submit"
+                disabled={status === "loading"}
+                className="flex items-center justify-center gap-2.5 font-black text-sm text-white transition-all hover:-translate-y-1 disabled:opacity-60"
+                style={{
+                  padding: "16px",
+                  borderRadius: "16px",
+                  border: "none",
+                  cursor: "pointer",
+                  background: "linear-gradient(135deg, #1b9aaa, #4fb477)",
+                  boxShadow: "0 16px 36px rgba(27,154,170,0.28)",
+                }}
+              >
+                {status === "loading" ? (
+                  <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Gönderiliyor...</>
+                ) : (
+                  <><Send className="w-4 h-4" /> Mesajı Gönder</>
+                )}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </div>

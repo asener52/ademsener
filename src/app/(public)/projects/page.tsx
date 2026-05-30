@@ -1,85 +1,128 @@
 import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
-import { FolderOpen, Eye, Calendar, Star, Tag, ExternalLink } from "lucide-react";
+import { Star, Eye, Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
-export default async function ProjectsPage() {
+const staticProjects = [
+  {
+    num: "01",
+    title: "Akıllı Şehir Web CBS Platformu",
+    desc: "Katman yönetimi, parsel sorgulama, ortofoto gösterimi, ölçüm araçları ve kent rehberi modülleri bulunan modern belediye CBS sistemi.",
+    tags: ["Leaflet", "PostGIS", "Node.js", "Raster Tile"],
+  },
+  {
+    num: "02",
+    title: "Belediye Çözüm Merkezi",
+    desc: "Vatandaş taleplerini ilgili birimlere yönlendiren, süreç takibi ve raporlama sağlayan web ve mobil uyumlu kurumsal sistem.",
+    tags: ["React", "API", "MSSQL", "Bildirim"],
+  },
+  {
+    num: "03",
+    title: "3D Model ve Ölçüm Uygulaması",
+    desc: "PLY, OBJ ve GLB modelleri görüntüleyen; mesafe, alan, koordinat ve hacim ölçümleri yapabilen teknik görüntüleme uygulaması.",
+    tags: ["Three.js", "CesiumJS", "3D Ölçüm", "Model Viewer"],
+  },
+];
+
+async function getDynPosts() {
   const supabase = await createClient();
-  const { data: posts } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("published", true)
-    .eq("type", "project")
+  const { data } = await supabase
+    .from("posts").select("*").eq("published", true).eq("type", "project")
     .order("created_at", { ascending: false });
+  return data || [];
+}
+
+export default async function ProjectsPage() {
+  const dynProjects = await getDynPosts();
+  const hasDyn = dynProjects.length > 0;
 
   return (
-    <div className="bg-slate-950 min-h-screen py-28">
-      {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-14">
-        <div className="relative rounded-3xl overflow-hidden p-10 bg-slate-900/80 border border-white/6">
-          <div className="absolute inset-0 bg-gradient-to-br from-rose-500/10 via-pink-500/5 to-transparent" />
-          <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-rose-500/8 blur-3xl" />
-          <div className="relative">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-bold uppercase tracking-widest mb-5">
-              <FolderOpen className="w-3.5 h-3.5" /> Projeler
-            </div>
-            <h1 className="text-5xl font-black text-white mb-3">Projelerim</h1>
-            <p className="text-slate-400 max-w-xl">CBS ve yazılım geliştirme alanlarında tamamladığım projeler, portföy çalışmaları ve açık kaynak katkılar.</p>
-          </div>
-        </div>
-      </div>
+    <div className="p-[58px]">
+      <div className="kicker">✨ Seçili projeler</div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {!posts || posts.length === 0 ? (
-          <div className="text-center py-24 rounded-2xl bg-slate-900/50 border border-white/5">
-            <div className="w-16 h-16 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto mb-4">
-              <FolderOpen className="w-8 h-8 text-rose-400" />
-            </div>
-            <p className="text-slate-400 font-medium mb-2">Henüz proje eklenmemiş</p>
-            <p className="text-slate-600 text-sm">Yakında projelerim burada yayınlanacak.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {posts.map((post) => (
-              <Link
-                key={post.id}
-                href={`/articles/${post.slug}`}
-                className="group flex flex-col rounded-2xl bg-slate-900/80 border border-white/6 hover:border-rose-500/30 overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-rose-500/5"
-              >
-                {post.cover_image ? (
-                  <div className="aspect-video overflow-hidden relative">
-                    <img src={post.cover_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
-                  </div>
-                ) : (
-                  <div className="aspect-video bg-gradient-to-br from-rose-500/10 to-pink-500/5 flex items-center justify-center relative overflow-hidden">
-                    <div className="absolute inset-0 map-grid opacity-40" />
-                    <FolderOpen className="w-10 h-10 text-rose-500/30 relative z-10" />
-                  </div>
-                )}
-                <div className="flex flex-col flex-1 p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30">Proje</span>
-                    {post.featured && <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />}
-                  </div>
-                  <h2 className="font-bold text-white mb-2 group-hover:text-rose-300 transition-colors line-clamp-2 leading-snug">{post.title}</h2>
-                  <p className="text-sm text-slate-500 flex-1 line-clamp-3 mb-4 leading-relaxed">{post.excerpt}</p>
-                  {post.tags?.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-4">
-                      {post.tags.slice(0, 4).map((tag: string) => (
-                        <span key={tag} className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-white/4 border border-white/6 text-slate-500">{tag}</span>
-                      ))}
-                    </div>
-                  )}
-                  <div className="flex items-center justify-between text-xs text-slate-600 pt-3 border-t border-white/5">
-                    <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3" />{formatDate(post.created_at)}</span>
-                    <span className="flex items-center gap-1.5"><Eye className="w-3 h-3" />{post.view_count}</span>
-                  </div>
+      <h2 style={{
+        fontSize: "clamp(34px, 4vw, 58px)",
+        lineHeight: 1.05,
+        letterSpacing: "-2px",
+        fontWeight: 900,
+        marginBottom: "40px",
+        color: "var(--text)",
+      }}>
+        Kurumsal ihtiyacı sahada çalışan<br />
+        <span className="gradient-text">çözüme dönüştüren işler.</span>
+      </h2>
+
+      {/* Dynamic posts from DB */}
+      {hasDyn && (
+        <div className="flex flex-col gap-5 mb-10">
+          {dynProjects.map((post: any, i: number) => (
+            <Link
+              key={post.id}
+              href={`/articles/${post.slug}`}
+              className="grid gap-5 items-center p-6 transition-all hover:-translate-y-1 group"
+              style={{
+                gridTemplateColumns: "1fr auto",
+                borderRadius: "26px",
+                background: "rgba(255,255,255,0.76)",
+                border: "1px solid rgba(255,255,255,0.86)",
+                boxShadow: "0 18px 38px rgba(31,90,110,0.10)",
+              }}
+            >
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  {post.featured && <Star className="w-4 h-4" style={{ color: "var(--warning)" }} fill="currentColor" />}
+                  <h3 className="text-[20px] font-bold group-hover:text-[#1b9aaa] transition-colors" style={{ color: "var(--text)" }}>{post.title}</h3>
                 </div>
-              </Link>
-            ))}
-          </div>
-        )}
+                <p className="text-[14px] leading-relaxed mb-3 line-clamp-2" style={{ color: "var(--muted)" }}>{post.excerpt}</p>
+                <div className="flex flex-wrap gap-2">
+                  {post.tags?.map((t: string) => <span key={t} className="tag">{t}</span>)}
+                </div>
+              </div>
+              <div
+                className="w-[74px] h-[74px] rounded-[24px] flex items-center justify-center text-2xl font-black text-white flex-shrink-0"
+                style={{ background: "linear-gradient(135deg, #1b9aaa, #6c63ff)" }}
+              >
+                {String(i + 1).padStart(2, "0")}
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {/* Static projects */}
+      <div className="flex flex-col gap-5">
+        {!hasDyn && <p className="text-sm font-semibold mb-2" style={{ color: "var(--muted)" }}>Örnek Projeler</p>}
+        {staticProjects.map(({ num, title, desc, tags }) => (
+          <article
+            key={num}
+            className="p-6 transition-all duration-300 hover:-translate-y-1"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr auto",
+              gap: "18px",
+              alignItems: "center",
+              borderRadius: "26px",
+              background: hasDyn ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.76)",
+              border: "1px solid rgba(255,255,255,0.86)",
+              boxShadow: "0 10px 28px rgba(31,90,110,0.08)",
+              opacity: hasDyn ? 0.65 : 1,
+            }}
+          >
+            <div>
+              <h3 className="text-[20px] font-bold mb-2" style={{ color: "var(--text)" }}>{title}</h3>
+              <p className="text-[14px] leading-relaxed mb-3" style={{ color: "var(--muted)" }}>{desc}</p>
+              <div className="flex flex-wrap gap-2">
+                {tags.map((t) => <span key={t} className="tag">{t}</span>)}
+              </div>
+            </div>
+            <div
+              className="w-[74px] h-[74px] rounded-[24px] flex items-center justify-center text-2xl font-black text-white flex-shrink-0"
+              style={{ background: "linear-gradient(135deg, #1b9aaa, #6c63ff)" }}
+            >
+              {num}
+            </div>
+          </article>
+        ))}
       </div>
     </div>
   );
