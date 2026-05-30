@@ -5,41 +5,39 @@ import { formatDate } from "@/lib/utils";
 export default async function NewsletterPage() {
   const supabase = await createClient();
   const { data: subscribers, count } = await supabase
-    .from("newsletter_subscribers")
-    .select("*", { count: "exact" })
-    .order("created_at", { ascending: false });
+    .from("newsletter_subscribers").select("*", { count: "exact" }).order("created_at", { ascending: false });
 
   return (
     <div className="p-6 lg:p-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-black text-white">Bülten Aboneleri</h1>
-        <p className="text-slate-400 text-sm mt-1">{count} abone</p>
+        <h1 className="text-2xl font-black" style={{ color: "#0f172a" }}>Bülten Aboneleri</h1>
+        <p className="text-sm mt-1" style={{ color: "#64748b" }}>{count} abone</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800">
-          <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center mb-3">
-            <Users className="w-5 h-5 text-sky-500" />
+        <div className="p-5 rounded-2xl" style={{ background: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: "rgba(27,154,170,0.10)" }}>
+            <Users className="w-5 h-5" style={{ color: "#1b9aaa" }} />
           </div>
-          <p className="text-2xl font-black text-white">{count}</p>
-          <p className="text-sm text-slate-400">Toplam Abone</p>
+          <p className="text-2xl font-black" style={{ color: "#0f172a" }}>{count}</p>
+          <p className="text-sm mt-0.5" style={{ color: "#64748b" }}>Toplam Abone</p>
         </div>
       </div>
 
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-        <div className="px-5 py-3 border-b border-slate-800 text-xs text-slate-500 uppercase tracking-wider grid grid-cols-3">
+      <div className="rounded-2xl overflow-hidden" style={{ background: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+        <div className="grid grid-cols-3 px-5 py-3 text-xs font-bold uppercase tracking-wider" style={{ borderBottom: "1px solid #f1f5f9", color: "#94a3b8" }}>
           <span>E-posta</span>
           <span>Tarih</span>
           <span></span>
         </div>
-        <div className="divide-y divide-slate-800">
+        <div>
           {subscribers?.map((sub) => (
-            <div key={sub.id} className="px-5 py-3 grid grid-cols-3 items-center hover:bg-slate-800/50 transition-colors">
+            <div key={sub.id} className="px-5 py-3 grid grid-cols-3 items-center hover:bg-slate-50 transition-colors" style={{ borderBottom: "1px solid #f8fafc" }}>
               <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-slate-500 flex-shrink-0" />
-                <span className="text-sm text-slate-300">{sub.email}</span>
+                <Mail className="w-4 h-4 flex-shrink-0" style={{ color: "#94a3b8" }} />
+                <span className="text-sm font-medium" style={{ color: "#334155" }}>{sub.email}</span>
               </div>
-              <div className="flex items-center gap-1.5 text-sm text-slate-500">
+              <div className="flex items-center gap-1.5 text-sm" style={{ color: "#94a3b8" }}>
                 <Calendar className="w-3.5 h-3.5" />
                 {formatDate(sub.created_at)}
               </div>
@@ -48,8 +46,8 @@ export default async function NewsletterPage() {
           ))}
           {(!subscribers || subscribers.length === 0) && (
             <div className="text-center py-12">
-              <Mail className="w-8 h-8 text-slate-700 mx-auto mb-2" />
-              <p className="text-slate-500 text-sm">Henüz abone yok.</p>
+              <Mail className="w-8 h-8 mx-auto mb-2" style={{ color: "#e2e8f0" }} />
+              <p className="text-sm" style={{ color: "#94a3b8" }}>Henüz abone yok.</p>
             </div>
           )}
         </div>
