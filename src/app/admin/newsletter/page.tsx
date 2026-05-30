@@ -1,11 +1,10 @@
-import { createClient } from "@/lib/supabase/server";
+import { query } from "@/lib/db";
 import { Mail, Users, Calendar } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 export default async function NewsletterPage() {
-  const supabase = await createClient();
-  const { data: subscribers, count } = await supabase
-    .from("newsletter_subscribers").select("*", { count: "exact" }).order("created_at", { ascending: false });
+  const subscribers = await query<any>("SELECT * FROM newsletter_subscribers ORDER BY created_at DESC");
+  const count = subscribers.length;
 
   return (
     <div style={{ padding: 48 }}>

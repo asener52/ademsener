@@ -1,18 +1,20 @@
-import { createClient } from "@/lib/supabase/server";
+import { queryOne } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { SurveyEditor } from "@/components/admin/survey-editor";
 
 export default async function EditSurveyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: survey } = await supabase.from("surveys").select("*").eq("id", id).single();
+  const survey = await queryOne<any>("SELECT * FROM surveys WHERE id = ?", [id]);
   if (!survey) notFound();
+  if (survey.questions && typeof survey.questions === "string") {
+    try { survey.questions = JSON.parse(survey.questions); } catch { survey.questions = []; }
+  }
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-black" style={{ color: "#0f172a" }}>Anketi Düzenle</h1>
-        <p className="text-sm mt-1" style={{ color: "#64748b" }}>{survey.title}</p>
+    <div style={{ padding: 48 }}>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-1px", color: "var(--text)" }}>Anketi Düzenle</h1>
+        <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 4 }}>{survey.title}</p>
       </div>
       <SurveyEditor survey={survey} />
     </div>

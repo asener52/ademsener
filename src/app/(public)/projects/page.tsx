@@ -1,7 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
+import { query } from "@/lib/db";
 import Link from "next/link";
-import { Star, Eye, Calendar } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import { Star } from "lucide-react";
 
 const staticProjects = [
   {
@@ -25,11 +24,13 @@ const staticProjects = [
 ];
 
 async function getDynPosts() {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("posts").select("*").eq("published", true).eq("type", "project")
-    .order("created_at", { ascending: false });
-  return data || [];
+  const data = await query<any>(
+    "SELECT * FROM posts WHERE published = 1 AND type = 'project' ORDER BY created_at DESC"
+  );
+  data.forEach((p: any) => {
+    if (p.tags && typeof p.tags === "string") { try { p.tags = JSON.parse(p.tags); } catch { p.tags = []; } }
+  });
+  return data;
 }
 
 export default async function ProjectsPage() {
@@ -66,11 +67,12 @@ export default async function ProjectsPage() {
                 background: "rgba(255,255,255,0.76)",
                 border: "1px solid rgba(255,255,255,0.86)",
                 boxShadow: "0 18px 38px rgba(31,90,110,0.10)",
+                textDecoration: "none",
               }}
             >
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  {post.featured && <Star className="w-4 h-4" style={{ color: "var(--warning)" }} fill="currentColor" />}
+                  {post.featured ? <Star className="w-4 h-4" style={{ color: "var(--warning)" }} fill="currentColor" /> : null}
                   <h3 className="text-[20px] font-bold group-hover:text-[#1b9aaa] transition-colors" style={{ color: "var(--text)" }}>{post.title}</h3>
                 </div>
                 <p className="text-[14px] leading-relaxed mb-3 line-clamp-2" style={{ color: "var(--muted)" }}>{post.excerpt}</p>

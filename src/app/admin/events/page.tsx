@@ -1,13 +1,11 @@
-import { createClient } from "@/lib/supabase/server";
+import { query } from "@/lib/db";
 import Link from "next/link";
 import { Plus, Edit, Calendar, MapPin, Wifi, Users } from "lucide-react";
 import { DeleteEventButton } from "@/components/admin/delete-event-button";
 
 async function getEvents() {
   try {
-    const supabase = await createClient();
-    const { data } = await supabase.from("events").select("*").order("event_date", { ascending: true });
-    return data || [];
+    return await query<any>("SELECT * FROM events ORDER BY event_date ASC");
   } catch { return []; }
 }
 

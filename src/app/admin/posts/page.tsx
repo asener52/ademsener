@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { query } from "@/lib/db";
 import Link from "next/link";
 import { Plus, Edit, Eye, Star } from "lucide-react";
 import { formatDate, typeLabels } from "@/lib/utils";
@@ -6,11 +6,10 @@ import { DeletePostButton } from "@/components/admin/delete-post-button";
 import { TogglePublishButton } from "@/components/admin/toggle-publish-button";
 
 async function getPosts(type?: string) {
-  const supabase = await createClient();
-  let q = supabase.from("posts").select("*").order("created_at", { ascending: false });
-  if (type && type !== "all") q = q.eq("type", type);
-  const { data } = await q;
-  return data || [];
+  if (type && type !== "all") {
+    return query<any>("SELECT * FROM posts WHERE type = ? ORDER BY created_at DESC", [type]);
+  }
+  return query<any>("SELECT * FROM posts ORDER BY created_at DESC");
 }
 
 const tabs = [

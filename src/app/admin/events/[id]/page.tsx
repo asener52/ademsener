@@ -1,18 +1,17 @@
-import { createClient } from "@/lib/supabase/server";
+import { queryOne } from "@/lib/db";
 import { notFound } from "next/navigation";
 import { EventEditor } from "@/components/admin/event-editor";
 
 export default async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: event } = await supabase.from("events").select("*").eq("id", id).single();
+  const event = await queryOne<any>("SELECT * FROM events WHERE id = ?", [id]);
   if (!event) notFound();
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-black" style={{ color: "#0f172a" }}>Etkinliği Düzenle</h1>
-        <p className="text-sm mt-1" style={{ color: "#64748b" }}>{event.title}</p>
+    <div style={{ padding: 48 }}>
+      <div style={{ marginBottom: 24 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-1px", color: "var(--text)" }}>Etkinliği Düzenle</h1>
+        <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 4 }}>{event.title}</p>
       </div>
       <EventEditor event={event} />
     </div>

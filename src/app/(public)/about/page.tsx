@@ -1,16 +1,22 @@
-import { createClient } from "@/lib/supabase/server";
+import { queryOne } from "@/lib/db";
 import Link from "next/link";
-import { Mail, ExternalLink, Check } from "lucide-react";
+import { ExternalLink, Check } from "lucide-react";
 
 async function getAbout() {
-  const supabase = await createClient();
-  const { data } = await supabase.from("about_info").select("*").limit(1).single();
-  return data;
+  const about = await queryOne<any>("SELECT * FROM about_info LIMIT 1");
+  if (!about) return null;
+  if (about.skills && typeof about.skills === "string") {
+    try { about.skills = JSON.parse(about.skills); } catch { about.skills = []; }
+  }
+  if (about.social_links && typeof about.social_links === "string") {
+    try { about.social_links = JSON.parse(about.social_links); } catch { about.social_links = {}; }
+  }
+  return about;
 }
 
 export default async function AboutPage() {
   const about = await getAbout();
-  const skills = about?.skills || ["CBS / GIS", "QGIS", "ArcGIS", "PostGIS", "Node.js", "React", "Python", "PostgreSQL", "WebGIS", "REST API"];
+  const skills: string[] = about?.skills || ["CBS / GIS", "QGIS", "ArcGIS", "PostGIS", "Node.js", "React", "Python", "PostgreSQL", "WebGIS", "REST API"];
 
   return (
     <div className="p-[58px]">

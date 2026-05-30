@@ -1,9 +1,12 @@
-import { createClient } from "@/lib/supabase/server";
+import { queryOne } from "@/lib/db";
 import { AboutEditor } from "@/components/admin/about-editor";
 
 export default async function AdminAboutPage() {
-  const supabase = await createClient();
-  const { data: about } = await supabase.from("about_info").select("*").limit(1).single();
+  const about = await queryOne<any>("SELECT * FROM about_info LIMIT 1");
+  if (about) {
+    if (about.skills && typeof about.skills === "string") { try { about.skills = JSON.parse(about.skills); } catch { about.skills = []; } }
+    if (about.social_links && typeof about.social_links === "string") { try { about.social_links = JSON.parse(about.social_links); } catch { about.social_links = {}; } }
+  }
 
   return (
     <div style={{ padding: 48 }}>

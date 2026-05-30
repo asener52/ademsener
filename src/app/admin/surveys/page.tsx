@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { query } from "@/lib/db";
 import Link from "next/link";
 import { Plus, Edit, ClipboardList, BarChart2, Users } from "lucide-react";
 import { formatDate } from "@/lib/utils";
@@ -6,12 +6,16 @@ import { DeleteSurveyButton } from "@/components/admin/delete-survey-button";
 
 async function getSurveys() {
   try {
-    const supabase = await createClient();
-    const { data: surveys } = await supabase.from("surveys").select("*").order("created_at", { ascending: false });
-    const { data: responseCounts } = await supabase.from("survey_responses").select("survey_id");
+    const [surveys, responseCounts] = await Promise.all([
+      query<any>("SELECT * FROM surveys ORDER BY created_at DESC"),
+      query<any>("SELECT survey_id FROM survey_responses"),
+    ]);
     const countMap: Record<string, number> = {};
-    responseCounts?.forEach(r => { countMap[r.survey_id] = (countMap[r.survey_id] || 0) + 1; });
-    return (surveys || []).map(s => ({ ...s, responseCount: countMap[s.id] || 0 }));
+    responseCounts.forEach((r: any) => { countMap[r.survey_id] = (countMap[r.survey_id] || 0) + 1; });
+    return surveys.map((s: any) => {
+      if (s.questions && typeof s.questions === "string") { try { s.questions = JSON.parse(s.questions); } catch { s.questions = []; } }
+      return { ...s, responseCount: countMap[s.id] || 0 };
+    });
   } catch { return []; }
 }
 

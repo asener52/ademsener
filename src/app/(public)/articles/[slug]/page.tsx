@@ -1,13 +1,17 @@
-import { createClient } from "@/lib/supabase/server";
+import { queryOne, execute } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Eye, Tag, Star, Clock } from "lucide-react";
 import { formatDate, typeColors, typeLabels } from "@/lib/utils";
 
 async function getPost(slug: string) {
-  const supabase = await createClient();
-  const { data } = await supabase.from("posts").select("*").eq("slug", slug).eq("published", true).single();
-  if (data) await supabase.rpc("increment_view_count", { post_id: data.id });
+  const data = await queryOne<any>("SELECT * FROM posts WHERE slug = ? AND published = 1", [slug]);
+  if (!data) return null;
+  if (data.tags && typeof data.tags === "string") {
+    try { data.tags = JSON.parse(data.tags); } catch { data.tags = []; }
+  }
+  // increment view count
+  await execute("UPDATE posts SET view_count = view_count + 1 WHERE id = ?", [data.id]);
   return data;
 }
 
@@ -30,14 +34,14 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
       {/* Meta */}
       <div className="flex flex-wrap items-center gap-3 mb-5">
-        <span className={`text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full border ${typeColors[post.type] || typeColors.article}`}>
-          {typeLabels[post.type] || post.type}
+        <span className={`text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full border ${(typeColors as any)[post.type] || (typeColors as any).article}`}>
+          {(typeLabels as any)[post.type] || post.type}
         </span>
-        {post.featured && (
+        {post.featured ? (
           <span className="flex items-center gap-1 text-xs font-bold" style={{ color: "var(--warning)" }}>
             <Star className="w-3.5 h-3.5" fill="currentColor" /> Öne Çıkan
           </span>
-        )}
+        ) : null}
       </div>
 
       <h1 className="font-black leading-tight mb-5" style={{ fontSize: "clamp(28px, 4vw, 48px)", letterSpacing: "-1.5px", color: "var(--text)" }}>

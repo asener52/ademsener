@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { query } from "@/lib/db";
 import Link from "next/link";
 import { Eye, Calendar, Star } from "lucide-react";
 import { formatDate, typeColors, typeLabels } from "@/lib/utils";
@@ -17,10 +17,14 @@ export default async function ArticlesPage({ searchParams }: { searchParams: Pro
   const params = await searchParams;
   const activeType = params.type || "all";
 
-  const supabase = await createClient();
-  let query = supabase.from("posts").select("*").eq("published", true).order("created_at", { ascending: false });
-  if (activeType !== "all") query = query.eq("type", activeType);
-  const { data: posts } = await query;
+  const posts = activeType === "all"
+    ? await query<any>("SELECT * FROM posts WHERE published = 1 ORDER BY created_at DESC")
+    : await query<any>("SELECT * FROM posts WHERE published = 1 AND type = ? ORDER BY created_at DESC", [activeType]);
+
+  // Parse JSON fields
+  posts.forEach((p: any) => {
+    if (p.tags && typeof p.tags === "string") { try { p.tags = JSON.parse(p.tags); } catch { p.tags = []; } }
+  });
 
   return (
     <div className="p-[58px]">
@@ -34,7 +38,7 @@ export default async function ArticlesPage({ searchParams }: { searchParams: Pro
         marginBottom: "28px",
         color: "var(--text)",
       }}>
-        CBS'den yazılıma,<br />
+        CBS&apos;den yazılıma,<br />
         <span className="gradient-text">tüm üretimim burada.</span>
       </h2>
 
@@ -57,7 +61,7 @@ export default async function ArticlesPage({ searchParams }: { searchParams: Pro
       </div>
 
       {/* Grid */}
-      {!posts || posts.length === 0 ? (
+      {posts.length === 0 ? (
         <div className="text-center py-20 rounded-3xl" style={{ background: "rgba(255,255,255,0.50)", border: "1px solid rgba(255,255,255,0.80)" }}>
           <p className="text-[15px]" style={{ color: "var(--muted)" }}>Bu kategoride henüz içerik bulunmuyor.</p>
         </div>
@@ -82,10 +86,10 @@ export default async function ArticlesPage({ searchParams }: { searchParams: Pro
 
               <div className="flex flex-col flex-1 p-5">
                 <div className="flex items-center justify-between mb-3">
-                  <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${typeColors[post.type] || typeColors.article}`}>
-                    {typeLabels[post.type] || post.type}
+                  <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full border ${(typeColors as any)[post.type] || (typeColors as any).article}`}>
+                    {(typeLabels as any)[post.type] || post.type}
                   </span>
-                  {post.featured && <Star className="w-3.5 h-3.5" style={{ color: "var(--warning)" }} fill="currentColor" />}
+                  {post.featured ? <Star className="w-3.5 h-3.5" style={{ color: "var(--warning)" }} fill="currentColor" /> : null}
                 </div>
                 <h3 className="font-bold mb-2 line-clamp-2 leading-snug group-hover:text-[#1b9aaa] transition-colors" style={{ color: "var(--text)", fontSize: "16px" }}>{post.title}</h3>
                 <p className="text-[13px] leading-relaxed flex-1 line-clamp-3 mb-4" style={{ color: "var(--muted)" }}>{post.excerpt}</p>

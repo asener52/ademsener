@@ -2,235 +2,136 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { slugify } from "@/lib/utils";
-import { Save, Eye, ArrowLeft, Star, Globe } from "lucide-react";
-import type { Post } from "@/types";
+import { Save, Eye, EyeOff, ArrowLeft, Star, Globe, Loader2 } from "lucide-react";
 
-interface PostEditorProps {
-  post?: Post;
-  mode: "create" | "edit";
-}
+interface Post { id?: string; title?: string; slug?: string; excerpt?: string; content?: string; cover_image?: string; type?: string; tags?: string[]; published?: boolean; featured?: boolean; }
 
-export function PostEditor({ post, mode }: PostEditorProps) {
+export function PostEditor({ post, mode }: { post?: Post; mode: "create" | "edit" }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
-    title: post?.title || "",
-    slug: post?.slug || "",
-    excerpt: post?.excerpt || "",
-    content: post?.content || "",
+    title:       post?.title       || "",
+    slug:        post?.slug        || "",
+    excerpt:     post?.excerpt     || "",
+    content:     post?.content     || "",
     cover_image: post?.cover_image || "",
-    type: post?.type || "article",
-    tags: post?.tags?.join(", ") || "",
-    published: post?.published || false,
-    featured: post?.featured || false,
+    type:        post?.type        || "article",
+    tags:        post?.tags?.join(", ") || "",
+    published:   post?.published   || false,
+    featured:    post?.featured    || false,
   });
 
-  const handleTitleChange = (title: string) => {
-    setForm((prev) => ({
-      ...prev,
-      title,
-      slug: mode === "create" ? slugify(title) : prev.slug,
-    }));
-  };
+  const handleTitleChange = (title: string) =>
+    setForm(p => ({ ...p, title, slug: mode === "create" ? slugify(title) : p.slug }));
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true);
-    const supabase = createClient();
-
-    const data = {
-      title: form.title,
+    setSaving(true); setError("");
+    const payload = {
+      ...form,
       slug: form.slug || slugify(form.title),
-      excerpt: form.excerpt,
-      content: form.content,
-      cover_image: form.cover_image || null,
-      type: form.type,
-      tags: form.tags ? form.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
-      published: form.published,
-      featured: form.featured,
+      tags: form.tags ? form.tags.split(",").map(t => t.trim()).filter(Boolean) : [],
     };
-
-    let error;
-    if (mode === "create") {
-      ({ error } = await supabase.from("posts").insert(data));
-    } else {
-      ({ error } = await supabase.from("posts").update(data).eq("id", post!.id));
-    }
-
+    const url    = mode === "create" ? "/api/admin/posts" : `/api/admin/posts/${post!.id}`;
+    const method = mode === "create" ? "POST" : "PUT";
+    const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
     setSaving(false);
-    if (!error) {
-      router.push("/admin/posts");
-      router.refresh();
-    }
+    if (res.ok) { router.push("/admin/posts"); router.refresh(); }
+    else setError("Kaydedilemedi, tekrar deneyin.");
   };
 
-  return (
-    <div className="p-6 lg:p-8">
-      <div className="flex items-center gap-4 mb-6">
-        <button
-          onClick={() => router.back()}
-          className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <div>
-          <h1 className="text-2xl font-black text-white">
-            {mode === "create" ? "Yeni İçerik" : "İçeriği Düzenle"}
-          </h1>
-        </div>
+  const inp: React.CSSProperties = { width: "100%", padding: "11px 14px", borderRadius: 12, fontSize: 14, border: "1px solid rgba(22,48,64,0.15)", background: "rgba(255,255,255,0.60)", color: "var(--text)", outline: "none", fontFamily: "inherit" };
+  const lbl: React.CSSProperties = { display: "block", fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--muted)", marginBottom: 6 };
+  const card: React.CSSProperties = { background: "rgba(255,255,255,0.76)", border: "1px solid rgba(255,255,255,0.86)", borderRadius: 22, padding: 22, boxShadow: "0 10px 24px rgba(31,90,110,0.07)" };
+
+  const Toggle = ({ value, onChange, label, icon: Icon, activeColor = "var(--primary)" }: any) => (
+    <label style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <Icon style={{ width: 16, height: 16, color: "var(--muted)" }} />
+        <span style={{ fontSize: 14, color: "var(--text)", fontWeight: 600 }}>{label}</span>
       </div>
+      <div onClick={onChange} style={{ width: 40, height: 22, borderRadius: 11, background: value ? activeColor : "rgba(22,48,64,0.15)", cursor: "pointer", position: "relative", transition: "background 0.2s", flexShrink: 0 }}>
+        <div style={{ width: 16, height: 16, borderRadius: "50%", background: "#fff", position: "absolute", top: 3, left: value ? 21 : 3, transition: "left 0.2s", boxShadow: "0 1px 4px rgba(0,0,0,0.15)" }} />
+      </div>
+    </label>
+  );
 
-      <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-5">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">Başlık *</label>
-                <input
-                  type="text"
-                  required
-                  value={form.title}
-                  onChange={(e) => handleTitleChange(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-colors"
-                  placeholder="İçerik başlığı..."
-                />
-              </div>
+  return (
+    <div style={{ padding: 48 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+        <button onClick={() => router.back()} style={{ padding: 8, borderRadius: 12, border: "1px solid rgba(22,48,64,0.12)", background: "rgba(255,255,255,0.76)", cursor: "pointer", display: "grid", placeItems: "center", color: "var(--muted)" }}>
+          <ArrowLeft style={{ width: 18, height: 18 }} />
+        </button>
+        <div className="kicker" style={{ margin: 0 }}>{mode === "create" ? "✍️ Yeni İçerik" : "✏️ Düzenle"}</div>
+      </div>
+      <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-1px", color: "var(--text)", marginBottom: 28 }}>
+        {mode === "create" ? "Yeni İçerik Oluştur" : form.title || "İçeriği Düzenle"}
+      </h1>
 
+      <form onSubmit={handleSave} style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20 }}>
+        {/* Main */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={card}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div><label style={lbl}>Başlık *</label><input required style={inp} value={form.title} onChange={e => handleTitleChange(e.target.value)} placeholder="İçerik başlığı..." /></div>
+              <div><label style={lbl}>Slug (URL)</label><input style={{ ...inp, fontFamily: "monospace" }} value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} placeholder="url-slug" /></div>
+              <div><label style={lbl}>Özet</label><textarea rows={3} style={{ ...inp, resize: "vertical" }} value={form.excerpt} onChange={e => setForm(f => ({ ...f, excerpt: e.target.value }))} placeholder="Kısa özet..." /></div>
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">Slug</label>
-                <input
-                  type="text"
-                  value={form.slug}
-                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-colors font-mono text-sm"
-                  placeholder="url-slug"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">Özet</label>
-                <textarea
-                  rows={3}
-                  value={form.excerpt}
-                  onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-colors resize-none text-sm"
-                  placeholder="Kısa özet..."
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1.5">İçerik (HTML destekli)</label>
-                <textarea
-                  rows={20}
-                  value={form.content}
-                  onChange={(e) => setForm({ ...form, content: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-colors resize-none text-sm font-mono"
-                  placeholder="<p>İçeriğinizi buraya yazın...</p>"
-                />
-                <p className="text-xs text-slate-500 mt-1">HTML etiketleri kullanabilirsiniz: &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;, &lt;a&gt;, vs.</p>
+                <label style={lbl}>İçerik (HTML destekli)</label>
+                <textarea rows={22} style={{ ...inp, fontFamily: "monospace", fontSize: 13, resize: "vertical" }} value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))} placeholder="<p>İçeriğinizi yazın...</p>" />
+                <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 6 }}>HTML etiketleri: &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;strong&gt;, &lt;a&gt; vb.</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Sidebar */}
-        <div className="space-y-5">
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {/* Publish */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-            <h3 className="text-sm font-semibold text-slate-300 mb-4">Yayın Ayarları</h3>
-            <div className="space-y-3">
-              <label className="flex items-center justify-between cursor-pointer">
-                <div className="flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-slate-400" />
-                  <span className="text-sm text-slate-300">Yayınla</span>
-                </div>
-                <div
-                  onClick={() => setForm({ ...form, published: !form.published })}
-                  className={`w-10 h-5 rounded-full transition-colors cursor-pointer ${form.published ? "bg-sky-500" : "bg-slate-700"}`}
-                >
-                  <div className={`w-4 h-4 rounded-full bg-white shadow mt-0.5 transition-transform ${form.published ? "translate-x-5" : "translate-x-0.5"}`} />
-                </div>
-              </label>
-              <label className="flex items-center justify-between cursor-pointer">
-                <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-slate-400" />
-                  <span className="text-sm text-slate-300">Öne Çıkan</span>
-                </div>
-                <div
-                  onClick={() => setForm({ ...form, featured: !form.featured })}
-                  className={`w-10 h-5 rounded-full transition-colors cursor-pointer ${form.featured ? "bg-amber-500" : "bg-slate-700"}`}
-                >
-                  <div className={`w-4 h-4 rounded-full bg-white shadow mt-0.5 transition-transform ${form.featured ? "translate-x-5" : "translate-x-0.5"}`} />
-                </div>
-              </label>
+          <div style={card}>
+            <p style={{ fontWeight: 800, fontSize: 13, color: "var(--text)", marginBottom: 14 }}>Yayın Ayarları</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <Toggle value={form.published} onChange={() => setForm(f => ({ ...f, published: !f.published }))} label="Yayınla" icon={form.published ? Eye : EyeOff} />
+              <Toggle value={form.featured}  onChange={() => setForm(f => ({ ...f, featured: !f.featured }))}  label="Öne Çıkan" icon={Star} activeColor="#f59e0b" />
             </div>
-
-            <button
-              type="submit"
-              disabled={saving}
-              className="w-full mt-5 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-sky-500 hover:bg-sky-600 disabled:opacity-50 text-white font-semibold text-sm transition-colors"
-            >
-              {saving ? (
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <Save className="w-4 h-4" />
-              )}
+            {error && <p style={{ fontSize: 12, color: "#ef4444", marginTop: 10, fontWeight: 600 }}>{error}</p>}
+            <button type="submit" disabled={saving}
+              style={{ marginTop: 16, width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "13px 0", borderRadius: 14, fontSize: 14, fontWeight: 800, color: "#fff", border: "none", cursor: saving ? "not-allowed" : "pointer", background: "linear-gradient(135deg,var(--primary),var(--secondary))", boxShadow: "0 8px 20px rgba(27,154,170,0.25)", opacity: saving ? 0.6 : 1, fontFamily: "inherit" }}>
+              {saving ? <Loader2 style={{ width: 16, height: 16, animation: "spin 1s linear infinite" }} /> : <Save style={{ width: 16, height: 16 }} />}
               {saving ? "Kaydediliyor..." : "Kaydet"}
             </button>
           </div>
 
           {/* Type */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
-            <h3 className="text-sm font-semibold text-slate-300 mb-3">İçerik Türü</h3>
-            <div className="space-y-2">
+          <div style={card}>
+            <p style={{ fontWeight: 800, fontSize: 13, color: "var(--text)", marginBottom: 14 }}>İçerik Türü</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {[
-                { value: "article", label: "Makale" },
-                { value: "news", label: "Son Gelişme" },
-                { value: "announcement", label: "Duyuru" },
-                { value: "training", label: "Eğitim" },
-                { value: "project", label: "Proje" },
-                { value: "publication", label: "Yayın" },
-              ].map(({ value, label }) => (
-                <label key={value} className="flex items-center gap-2.5 cursor-pointer">
-                  <div
-                    onClick={() => setForm({ ...form, type: value as any })}
-                    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
-                      form.type === value ? "border-sky-500 bg-sky-500" : "border-slate-600"
-                    }`}
-                  >
-                    {form.type === value && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                { value: "article",      label: "Makale",       color: "var(--primary)" },
+                { value: "news",         label: "Haber",        color: "var(--secondary)" },
+                { value: "announcement", label: "Duyuru",       color: "#f59e0b" },
+                { value: "training",     label: "Eğitim",       color: "var(--accent)" },
+                { value: "project",      label: "Proje",        color: "#ef4444" },
+                { value: "publication",  label: "Yayın",        color: "#805ad5" },
+              ].map(({ value, label, color }) => (
+                <label key={value} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }} onClick={() => setForm(f => ({ ...f, type: value }))}>
+                  <div style={{ width: 16, height: 16, borderRadius: "50%", border: `2px solid ${form.type === value ? color : "rgba(22,48,64,0.20)"}`, background: form.type === value ? color : "transparent", display: "grid", placeItems: "center", transition: "all 0.15s", flexShrink: 0 }}>
+                    {form.type === value && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />}
                   </div>
-                  <span className="text-sm text-slate-300">{label}</span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: form.type === value ? color : "var(--muted)" }}>{label}</span>
                 </label>
               ))}
             </div>
           </div>
 
           {/* Meta */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-            <h3 className="text-sm font-semibold text-slate-300">Meta Bilgiler</h3>
-            <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">Kapak Görseli URL</label>
-              <input
-                type="url"
-                value={form.cover_image}
-                onChange={(e) => setForm({ ...form, cover_image: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-colors"
-                placeholder="https://..."
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1.5">Etiketler (virgülle ayırın)</label>
-              <input
-                type="text"
-                value={form.tags}
-                onChange={(e) => setForm({ ...form, tags: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-sky-500 transition-colors"
-                placeholder="cbs, gis, harita"
-              />
+          <div style={card}>
+            <p style={{ fontWeight: 800, fontSize: 13, color: "var(--text)", marginBottom: 14 }}>Meta</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div><label style={lbl}>Kapak Görseli URL</label><input type="url" style={inp} value={form.cover_image} onChange={e => setForm(f => ({ ...f, cover_image: e.target.value }))} placeholder="https://..." /></div>
+              <div><label style={lbl}>Etiketler (virgülle)</label><input style={inp} value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} placeholder="cbs, gis, harita" /></div>
             </div>
           </div>
         </div>

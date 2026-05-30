@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { queryOne, query } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, BarChart2, Users } from "lucide-react";
@@ -6,112 +6,119 @@ import { formatDate } from "@/lib/utils";
 
 export default async function SurveyResultsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = await createClient();
 
-  const [{ data: survey }, { data: responses }] = await Promise.all([
-    supabase.from("surveys").select("*").eq("id", id).single(),
-    supabase.from("survey_responses").select("*").eq("survey_id", id).order("created_at", { ascending: false }),
+  const [survey, responses] = await Promise.all([
+    queryOne<any>("SELECT * FROM surveys WHERE id = ?", [id]),
+    query<any>("SELECT * FROM survey_responses WHERE survey_id = ? ORDER BY created_at DESC", [id]),
   ]);
 
   if (!survey) notFound();
 
+  if (survey.questions && typeof survey.questions === "string") {
+    try { survey.questions = JSON.parse(survey.questions); } catch { survey.questions = []; }
+  }
+
+  // Parse answers JSON in each response
+  const parsedResponses = responses.map((r: any) => {
+    if (r.answers && typeof r.answers === "string") {
+      try { r.answers = JSON.parse(r.answers); } catch { r.answers = {}; }
+    }
+    return r;
+  });
+
   const questions: any[] = survey.questions || [];
 
-  // Aggregate answers per question
   const aggregated = questions.map((q: any, qi: number) => {
-    const answers = (responses || []).map(r => (r.answers as any)[qi]);
+    const answers = parsedResponses.map((r: any) => r.answers[qi]);
     if (q.type === "text") {
       return { ...q, textAnswers: answers.filter(Boolean) };
     }
     if (q.type === "rating") {
       const nums = answers.filter(Boolean).map(Number);
-      const avg = nums.length ? (nums.reduce((a, b) => a + b, 0) / nums.length).toFixed(1) : "-";
+      const avg = nums.length ? (nums.reduce((a: number, b: number) => a + b, 0) / nums.length).toFixed(1) : "-";
       const dist: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-      nums.forEach(n => { if (dist[n] !== undefined) dist[n]++; });
+      nums.forEach((n: number) => { if (dist[n] !== undefined) dist[n]++; });
       return { ...q, avg, dist, total: nums.length };
     }
-    // single / multiple
     const counts: Record<string, number> = {};
     (q.options || []).forEach((o: string) => { counts[o] = 0; });
-    answers.forEach(a => {
-      if (Array.isArray(a)) a.forEach(v => { if (counts[v] !== undefined) counts[v]++; });
+    answers.forEach((a: any) => {
+      if (Array.isArray(a)) a.forEach((v: string) => { if (counts[v] !== undefined) counts[v]++; });
       else if (a && counts[a] !== undefined) counts[a]++;
     });
-    const total = Object.values(counts).reduce((s, n) => s + n, 0);
+    const total = Object.values(counts).reduce((s: number, n: number) => s + n, 0);
     return { ...q, counts, total };
   });
 
   return (
-    <div className="p-6 lg:p-8 max-w-3xl">
-      <div className="mb-6">
-        <Link href="/admin/surveys" className="flex items-center gap-1.5 text-sm font-semibold mb-4" style={{ color: "#64748b" }}>
-          <ArrowLeft className="w-4 h-4" /> Anketlere Dön
+    <div style={{ padding: 48, maxWidth: 760 }}>
+      <div style={{ marginBottom: 24 }}>
+        <Link href="/admin/surveys" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: "var(--muted)", marginBottom: 16, textDecoration: "none" }}>
+          <ArrowLeft style={{ width: 16, height: 16 }} /> Anketlere Dön
         </Link>
-        <h1 className="text-2xl font-black" style={{ color: "#0f172a" }}>{survey.title}</h1>
-        <div className="flex items-center gap-4 mt-2">
-          <span className="flex items-center gap-1.5 text-sm" style={{ color: "#64748b" }}>
-            <Users className="w-4 h-4" /> {(responses || []).length} yanıt
+        <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-1px", color: "var(--text)" }}>{survey.title}</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 8 }}>
+          <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--muted)" }}>
+            <Users style={{ width: 14, height: 14 }} /> {parsedResponses.length} yanıt
           </span>
-          <span className="text-sm" style={{ color: "#94a3b8" }}>{formatDate(survey.created_at)}</span>
+          <span style={{ fontSize: 13, color: "var(--muted)" }}>{formatDate(survey.created_at)}</span>
         </div>
       </div>
 
-      {(responses || []).length === 0 ? (
-        <div className="text-center py-16 rounded-2xl" style={{ background: "#ffffff", border: "1px solid #e2e8f0" }}>
-          <BarChart2 className="w-10 h-10 mx-auto mb-3" style={{ color: "#e2e8f0" }} />
-          <p style={{ color: "#94a3b8" }}>Henüz yanıt yok.</p>
+      {parsedResponses.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "64px 0", borderRadius: 22, background: "rgba(255,255,255,0.76)", border: "1px solid rgba(255,255,255,0.86)" }}>
+          <BarChart2 style={{ width: 40, height: 40, margin: "0 auto 12px", color: "rgba(22,48,64,0.15)" }} />
+          <p style={{ color: "var(--muted)" }}>Henüz yanıt yok.</p>
         </div>
       ) : (
-        <div className="space-y-5">
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {aggregated.map((q: any, i: number) => (
-            <div key={i} className="p-5 rounded-2xl" style={{ background: "#ffffff", border: "1px solid #e2e8f0", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="w-6 h-6 rounded-lg text-xs font-black flex items-center justify-center"
-                  style={{ background: "rgba(27,154,170,0.10)", color: "#1b9aaa" }}>{i + 1}</span>
-                <h3 className="font-bold text-sm flex-1" style={{ color: "#0f172a" }}>{q.text || "(Soru metni yok)"}</h3>
-                <span className="text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: "#f1f5f9", color: "#64748b" }}>
+            <div key={i} style={{ padding: 22, borderRadius: 22, background: "rgba(255,255,255,0.76)", border: "1px solid rgba(255,255,255,0.86)", boxShadow: "0 10px 24px rgba(31,90,110,0.07)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                <span style={{ width: 24, height: 24, borderRadius: 8, fontSize: 11, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(27,154,170,0.10)", color: "var(--primary)" }}>{i + 1}</span>
+                <h3 style={{ fontWeight: 700, fontSize: 14, flex: 1, color: "var(--text)" }}>{q.text || "(Soru metni yok)"}</h3>
+                <span style={{ fontSize: 11, padding: "2px 10px", borderRadius: 20, fontWeight: 600, background: "rgba(22,48,64,0.06)", color: "var(--muted)" }}>
                   {q.type === "single" ? "Tek Seçim" : q.type === "multiple" ? "Çoklu" : q.type === "rating" ? "Puan" : "Metin"}
                 </span>
               </div>
 
               {(q.type === "single" || q.type === "multiple") && (
-                <div className="space-y-2">
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {Object.entries(q.counts || {}).map(([opt, cnt]: any) => {
                     const pct = q.total > 0 ? Math.round((cnt / q.total) * 100) : 0;
                     return (
                       <div key={opt}>
-                        <div className="flex items-center justify-between text-xs mb-1">
-                          <span style={{ color: "#334155", fontWeight: 600 }}>{opt}</span>
-                          <span style={{ color: "#64748b" }}>{cnt} yanıt · %{pct}</span>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
+                          <span style={{ color: "var(--text)", fontWeight: 600 }}>{opt}</span>
+                          <span style={{ color: "var(--muted)" }}>{cnt} yanıt · %{pct}</span>
                         </div>
-                        <div className="h-2 rounded-full overflow-hidden" style={{ background: "#f1f5f9" }}>
-                          <div className="h-full rounded-full transition-all"
-                            style={{ width: `${pct}%`, background: "linear-gradient(90deg,#1b9aaa,#4fb477)" }} />
+                        <div style={{ height: 8, borderRadius: 4, overflow: "hidden", background: "rgba(22,48,64,0.06)" }}>
+                          <div style={{ width: `${pct}%`, height: "100%", borderRadius: 4, background: "linear-gradient(90deg,var(--primary),var(--secondary))" }} />
                         </div>
                       </div>
                     );
                   })}
-                  <p className="text-xs mt-2" style={{ color: "#94a3b8" }}>Toplam: {q.total} yanıt</p>
+                  <p style={{ fontSize: 11, color: "var(--muted)", marginTop: 4 }}>Toplam: {q.total} yanıt</p>
                 </div>
               )}
 
               {q.type === "rating" && (
                 <div>
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-3xl font-black" style={{ color: "#1b9aaa" }}>{q.avg}</span>
-                    <span className="text-sm" style={{ color: "#64748b" }}>/ 5 ortalama ({q.total} yanıt)</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+                    <span style={{ fontSize: 32, fontWeight: 900, color: "var(--primary)" }}>{q.avg}</span>
+                    <span style={{ fontSize: 13, color: "var(--muted)" }}>/ 5 ortalama ({q.total} yanıt)</span>
                   </div>
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5].map(n => {
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {[1, 2, 3, 4, 5].map((n: number) => {
                       const cnt = q.dist[n] || 0;
                       const pct = q.total > 0 ? Math.round((cnt / q.total) * 100) : 0;
                       return (
-                        <div key={n} className="flex-1 text-center">
-                          <div className="h-16 rounded-lg flex items-end justify-center p-1" style={{ background: "#f8fafc" }}>
-                            <div className="w-full rounded" style={{ height: `${pct || 2}%`, background: "linear-gradient(0deg,#1b9aaa,#4fb477)", minHeight: 4 }} />
+                        <div key={n} style={{ flex: 1, textAlign: "center" }}>
+                          <div style={{ height: 64, borderRadius: 8, display: "flex", alignItems: "flex-end", justifyContent: "center", padding: 4, background: "rgba(22,48,64,0.04)" }}>
+                            <div style={{ width: "100%", borderRadius: 4, height: `${Math.max(pct, 4)}%`, background: "linear-gradient(0deg,var(--primary),var(--secondary))" }} />
                           </div>
-                          <p className="text-xs font-bold mt-1" style={{ color: "#64748b" }}>{n}</p>
-                          <p className="text-xs" style={{ color: "#94a3b8" }}>{cnt}</p>
+                          <p style={{ fontSize: 11, fontWeight: 700, color: "var(--muted)", marginTop: 4 }}>{n}</p>
+                          <p style={{ fontSize: 11, color: "var(--muted)" }}>{cnt}</p>
                         </div>
                       );
                     })}
@@ -120,11 +127,11 @@ export default async function SurveyResultsPage({ params }: { params: Promise<{ 
               )}
 
               {q.type === "text" && (
-                <div className="space-y-2 max-h-48 overflow-y-auto">
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 200, overflowY: "auto" }}>
                   {(q.textAnswers || []).length === 0 ? (
-                    <p className="text-sm" style={{ color: "#94a3b8" }}>Yanıt yok</p>
+                    <p style={{ fontSize: 13, color: "var(--muted)" }}>Yanıt yok</p>
                   ) : q.textAnswers.map((a: string, ai: number) => (
-                    <div key={ai} className="p-3 rounded-xl text-sm" style={{ background: "#f8fafc", color: "#334155" }}>
+                    <div key={ai} style={{ padding: "10px 14px", borderRadius: 10, fontSize: 13, background: "rgba(22,48,64,0.04)", color: "var(--text)" }}>
                       "{a}"
                     </div>
                   ))}

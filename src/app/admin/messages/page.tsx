@@ -1,12 +1,10 @@
-import { createClient } from "@/lib/supabase/server";
+import { query } from "@/lib/db";
 import { formatDate } from "@/lib/utils";
 import { MessageSquare, Mail, Calendar } from "lucide-react";
 import { MarkReadButton } from "@/components/admin/mark-read-button";
 
 async function getMessages() {
-  const supabase = await createClient();
-  const { data } = await supabase.from("messages").select("*").order("created_at", { ascending: false });
-  return data || [];
+  return query<any>("SELECT * FROM messages ORDER BY created_at DESC");
 }
 
 export default async function MessagesPage() {
