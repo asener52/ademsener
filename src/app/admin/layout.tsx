@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AdminSidebar } from "@/components/admin/sidebar";
 
@@ -10,8 +9,9 @@ export default async function AdminLayout({
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  // Login sayfası: sidebar olmadan sadece içeriği göster
   if (!user) {
-    redirect("/admin/login");
+    return <div className="min-h-screen bg-slate-950">{children}</div>;
   }
 
   return (
