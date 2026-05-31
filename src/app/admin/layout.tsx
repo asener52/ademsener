@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { getSession } from "@/lib/auth";
+import { getSession } from "@/lib/session";
 import { AdminSidebar } from "@/components/admin/sidebar";
 import { AdminPageWrapper } from "@/components/admin/page-wrapper";
 
