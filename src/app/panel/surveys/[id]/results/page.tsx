@@ -53,7 +53,7 @@ export default async function SurveyResultsPage({ params }: { params: Promise<{ 
   return (
     <div style={{ padding: 48, maxWidth: 760 }}>
       <div style={{ marginBottom: 24 }}>
-        <Link href="/admin/surveys" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: "var(--muted)", marginBottom: 16, textDecoration: "none" }}>
+        <Link href="/panel/surveys" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: "var(--muted)", marginBottom: 16, textDecoration: "none" }}>
           <ArrowLeft style={{ width: 16, height: 16 }} /> Anketlere Dön
         </Link>
         <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-1px", color: "var(--text)" }}>{survey.title}</h1>

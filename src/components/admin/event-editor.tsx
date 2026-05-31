@@ -61,7 +61,7 @@ export function EventEditor({ event }: { event?: EventData | null }) {
       const method = event?.id ? "PUT" : "POST";
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!res.ok) throw new Error(await res.text());
-      router.push("/admin/events");
+      router.push("/panel/events");
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Bir hata oluştu");
@@ -182,7 +182,7 @@ export function EventEditor({ event }: { event?: EventData | null }) {
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {event?.id ? "Güncelle" : "Kaydet"}
         </button>
-        <a href="/admin/events" className="px-6 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-slate-100"
+        <a href="/panel/events" className="px-6 py-3 rounded-xl text-sm font-bold transition-colors hover:bg-slate-100"
           style={{ color: "#64748b", border: "1px solid #e2e8f0" }}>
           İptal
         </a>
