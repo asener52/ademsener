@@ -44,7 +44,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
           <h1 style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-1.5px", color: "var(--text)" }}>İçerikler</h1>
           <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 4 }}>{posts.length} içerik bulundu</p>
         </div>
-        <Link href="/panel/posts/new"
+        <Link href="/yonetim/posts/new"
           style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 22px", borderRadius: 16, fontSize: 14, fontWeight: 800, textDecoration: "none", color: "#fff", background: "linear-gradient(135deg,var(--primary),var(--secondary))", boxShadow: "0 10px 24px rgba(27,154,170,0.28)" }}>
           <Plus style={{ width: 16, height: 16 }} /> Yeni İçerik
         </Link>
@@ -54,7 +54,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 22 }}>
         {tabs.map(tab => (
           <Link key={tab.value}
-            href={tab.value === "all" ? "/panel/posts" : `/panel/posts?type=${tab.value}`}
+            href={tab.value === "all" ? "/yonetim/posts" : `/yonetim/posts?type=${tab.value}`}
             style={{
               padding: "9px 18px", borderRadius: 14, fontSize: 13, fontWeight: 700, textDecoration: "none",
               ...(activeType === tab.value
@@ -71,7 +71,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
         {posts.length === 0 ? (
           <div style={{ textAlign: "center", padding: "64px 24px" }}>
             <p style={{ color: "var(--muted)", marginBottom: 14, fontSize: 14 }}>Bu kategoride içerik yok.</p>
-            <Link href="/panel/posts/new" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "var(--primary)", textDecoration: "none" }}>
+            <Link href="/yonetim/posts/new" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 700, color: "var(--primary)", textDecoration: "none" }}>
               <Plus style={{ width: 14, height: 14 }} /> İlk içeriği oluştur
             </Link>
           </div>
@@ -120,7 +120,7 @@ export default async function PostsPage({ searchParams }: { searchParams: Promis
                             onMouseLeave={e => { e.currentTarget.style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}>
                             <Eye style={{ width: 15, height: 15 }} />
                           </Link>
-                          <Link href={`/panel/posts/${post.id}`}
+                          <Link href={`/yonetim/posts/${post.id}`}
                             style={{ padding: 6, borderRadius: 10, color: "var(--muted)", display: "grid", placeItems: "center", transition: "all 0.18s" }}
                             onMouseEnter={e => { e.currentTarget.style.background = "rgba(108,99,255,0.08)"; (e.currentTarget as HTMLElement).style.color = "var(--accent)"; }}
                             onMouseLeave={e => { e.currentTarget.style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}>

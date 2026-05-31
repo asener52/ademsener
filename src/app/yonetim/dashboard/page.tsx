@@ -67,10 +67,10 @@ export default async function DashboardPage() {
   ];
 
   const typeCards = [
-    { label: "Makale", icon: BookOpen,      color: "var(--primary)",   bg: "rgba(27,154,170,0.10)", count: stats.typeCounts.article,      href: "/panel/posts?type=article" },
-    { label: "Haber",  icon: Newspaper,     color: "var(--secondary)", bg: "rgba(79,180,119,0.10)", count: stats.typeCounts.news,         href: "/panel/posts?type=news" },
-    { label: "Duyuru", icon: Megaphone,     color: "#f59e0b",          bg: "rgba(245,158,11,0.10)", count: stats.typeCounts.announcement, href: "/panel/posts?type=announcement" },
-    { label: "Eğitim", icon: GraduationCap, color: "var(--accent)",   bg: "rgba(108,99,255,0.10)", count: stats.typeCounts.training,     href: "/panel/posts?type=training" },
+    { label: "Makale", icon: BookOpen,      color: "var(--primary)",   bg: "rgba(27,154,170,0.10)", count: stats.typeCounts.article,      href: "/yonetim/posts?type=article" },
+    { label: "Haber",  icon: Newspaper,     color: "var(--secondary)", bg: "rgba(79,180,119,0.10)", count: stats.typeCounts.news,         href: "/yonetim/posts?type=news" },
+    { label: "Duyuru", icon: Megaphone,     color: "#f59e0b",          bg: "rgba(245,158,11,0.10)", count: stats.typeCounts.announcement, href: "/yonetim/posts?type=announcement" },
+    { label: "Eğitim", icon: GraduationCap, color: "var(--accent)",   bg: "rgba(108,99,255,0.10)", count: stats.typeCounts.training,     href: "/yonetim/posts?type=training" },
   ];
 
   return (
@@ -81,10 +81,10 @@ export default async function DashboardPage() {
           Hoş geldiniz, <span style={{ background: "linear-gradient(135deg,var(--primary),var(--secondary))", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Adem Bey</span> 👋
         </h1>
         <div style={{ display: "flex", gap: 10 }}>
-          <Link href="/panel/events/new" style={{ display:"flex",alignItems:"center",gap:8,padding:"11px 18px",borderRadius:14,fontSize:13,fontWeight:700,textDecoration:"none",background:"rgba(255,255,255,0.80)",border:"1px solid var(--border)",color:"var(--text)",boxShadow:"0 6px 16px rgba(31,90,110,0.06)" }}>
+          <Link href="/yonetim/events/new" style={{ display:"flex",alignItems:"center",gap:8,padding:"11px 18px",borderRadius:14,fontSize:13,fontWeight:700,textDecoration:"none",background:"rgba(255,255,255,0.80)",border:"1px solid var(--border)",color:"var(--text)",boxShadow:"0 6px 16px rgba(31,90,110,0.06)" }}>
             <Calendar style={{ width:15,height:15,color:"var(--primary)" }} /> Etkinlik
           </Link>
-          <Link href="/panel/posts/new" style={{ display:"flex",alignItems:"center",gap:8,padding:"11px 18px",borderRadius:14,fontSize:13,fontWeight:700,textDecoration:"none",background:"linear-gradient(135deg,var(--primary),var(--secondary))",color:"#fff",boxShadow:"0 10px 24px rgba(27,154,170,0.28)" }}>
+          <Link href="/yonetim/posts/new" style={{ display:"flex",alignItems:"center",gap:8,padding:"11px 18px",borderRadius:14,fontSize:13,fontWeight:700,textDecoration:"none",background:"linear-gradient(135deg,var(--primary),var(--secondary))",color:"#fff",boxShadow:"0 10px 24px rgba(27,154,170,0.28)" }}>
             <Plus style={{ width:15,height:15 }} /> Yeni İçerik
           </Link>
         </div>
@@ -126,10 +126,10 @@ export default async function DashboardPage() {
         <div style={{ background:"rgba(255,255,255,0.76)",border:"1px solid rgba(255,255,255,0.86)",borderRadius:24,overflow:"hidden",boxShadow:"0 12px 28px rgba(31,90,110,0.08)" }}>
           <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 20px",borderBottom:"1px solid rgba(22,48,64,0.07)" }}>
             <p style={{ fontWeight:800,fontSize:14,color:"var(--text)" }}>Son İçerikler</p>
-            <Link href="/panel/posts" style={{ fontSize:12,fontWeight:700,color:"var(--primary)",textDecoration:"none",display:"flex",alignItems:"center",gap:4 }}>Tümü <ArrowRight style={{ width:12,height:12 }} /></Link>
+            <Link href="/yonetim/posts" style={{ fontSize:12,fontWeight:700,color:"var(--primary)",textDecoration:"none",display:"flex",alignItems:"center",gap:4 }}>Tümü <ArrowRight style={{ width:12,height:12 }} /></Link>
           </div>
           {(posts as any[]).map(p => (
-            <Link key={p.id} href={`/panel/posts/${p.id}`} style={{ display:"flex",alignItems:"center",gap:12,padding:"12px 20px",textDecoration:"none",borderBottom:"1px solid rgba(22,48,64,0.04)" }}>
+            <Link key={p.id} href={`/yonetim/posts/${p.id}`} style={{ display:"flex",alignItems:"center",gap:12,padding:"12px 20px",textDecoration:"none",borderBottom:"1px solid rgba(22,48,64,0.04)" }}>
               <div style={{ flex:1,minWidth:0 }}>
                 <p style={{ fontSize:13,fontWeight:700,color:"var(--text)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{p.title}</p>
                 <p style={{ fontSize:11,color:"var(--muted)",marginTop:2 }}>{formatDate(p.created_at)}</p>
@@ -149,7 +149,7 @@ export default async function DashboardPage() {
               <p style={{ fontWeight:800,fontSize:14,color:"var(--text)" }}>Mesajlar</p>
               {stats.unread > 0 && <span style={{ fontSize:11,fontWeight:800,padding:"2px 8px",borderRadius:8,background:"rgba(239,68,68,0.12)",color:"#ef4444" }}>{stats.unread} yeni</span>}
             </div>
-            <Link href="/panel/messages" style={{ fontSize:12,fontWeight:700,color:"var(--primary)",textDecoration:"none",display:"flex",alignItems:"center",gap:4 }}>Tümü <ArrowRight style={{ width:12,height:12 }} /></Link>
+            <Link href="/yonetim/messages" style={{ fontSize:12,fontWeight:700,color:"var(--primary)",textDecoration:"none",display:"flex",alignItems:"center",gap:4 }}>Tümü <ArrowRight style={{ width:12,height:12 }} /></Link>
           </div>
           {(msgs as any[]).map(m => (
             <div key={m.id} style={{ padding:"12px 20px",borderBottom:"1px solid rgba(22,48,64,0.04)",background:!m.read?"rgba(27,154,170,0.04)":"transparent" }}>
@@ -167,12 +167,12 @@ export default async function DashboardPage() {
         <div style={{ background:"rgba(255,255,255,0.76)",border:"1px solid rgba(255,255,255,0.86)",borderRadius:24,overflow:"hidden",boxShadow:"0 12px 28px rgba(31,90,110,0.08)" }}>
           <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",padding:"18px 20px",borderBottom:"1px solid rgba(22,48,64,0.07)" }}>
             <p style={{ fontWeight:800,fontSize:14,color:"var(--text)" }}>Etkinlikler</p>
-            <Link href="/panel/events" style={{ fontSize:12,fontWeight:700,color:"var(--primary)",textDecoration:"none",display:"flex",alignItems:"center",gap:4 }}>Tümü <ArrowRight style={{ width:12,height:12 }} /></Link>
+            <Link href="/yonetim/events" style={{ fontSize:12,fontWeight:700,color:"var(--primary)",textDecoration:"none",display:"flex",alignItems:"center",gap:4 }}>Tümü <ArrowRight style={{ width:12,height:12 }} /></Link>
           </div>
           {(events as any[]).map(ev => {
             const d = new Date(ev.event_date);
             return (
-              <Link key={ev.id} href={`/panel/events/${ev.id}`} style={{ display:"flex",alignItems:"center",gap:12,padding:"12px 20px",textDecoration:"none",borderBottom:"1px solid rgba(22,48,64,0.04)" }}>
+              <Link key={ev.id} href={`/yonetim/events/${ev.id}`} style={{ display:"flex",alignItems:"center",gap:12,padding:"12px 20px",textDecoration:"none",borderBottom:"1px solid rgba(22,48,64,0.04)" }}>
                 <div style={{ width:38,height:38,borderRadius:12,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(27,154,170,0.08)",flexShrink:0 }}>
                   <span style={{ fontSize:14,fontWeight:900,color:"var(--primary)",lineHeight:1 }}>{d.getDate()}</span>
                   <span style={{ fontSize:9,fontWeight:700,color:"var(--muted)",textTransform:"uppercase" }}>{d.toLocaleString("tr-TR",{month:"short"})}</span>
@@ -187,7 +187,7 @@ export default async function DashboardPage() {
           {events.length === 0 && (
             <div style={{ textAlign:"center",padding:"32px 20px" }}>
               <p style={{ fontSize:13,color:"var(--muted)",marginBottom:8 }}>Etkinlik yok</p>
-              <Link href="/panel/events/new" style={{ fontSize:12,fontWeight:700,color:"var(--primary)",textDecoration:"none" }}>+ Etkinlik Ekle</Link>
+              <Link href="/yonetim/events/new" style={{ fontSize:12,fontWeight:700,color:"var(--primary)",textDecoration:"none" }}>+ Etkinlik Ekle</Link>
             </div>
           )}
         </div>

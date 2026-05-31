@@ -30,7 +30,7 @@ export default async function SurveysPage() {
           <h1 style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-1.5px", color: "var(--text)" }}>Anketler</h1>
           <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 4 }}>{surveys.length} anket · {surveys.filter(s => s.is_active).length} aktif</p>
         </div>
-        <Link href="/panel/surveys/new"
+        <Link href="/yonetim/surveys/new"
           style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 22px", borderRadius: 16, fontSize: 14, fontWeight: 800, textDecoration: "none", color: "#fff", background: "linear-gradient(135deg,var(--primary),var(--secondary))", boxShadow: "0 10px 24px rgba(27,154,170,0.28)" }}>
           <Plus style={{ width: 16, height: 16 }} /> Yeni Anket
         </Link>
@@ -40,7 +40,7 @@ export default async function SurveysPage() {
         <div style={{ textAlign: "center", padding: "64px 24px", background: "rgba(255,255,255,0.76)", border: "1px solid rgba(255,255,255,0.86)", borderRadius: 24, boxShadow: "0 12px 28px rgba(31,90,110,0.08)" }}>
           <ClipboardList style={{ width: 48, height: 48, color: "rgba(22,48,64,0.12)", margin: "0 auto 14px" }} />
           <p style={{ fontWeight: 700, color: "var(--text)", marginBottom: 10 }}>Henüz anket yok</p>
-          <Link href="/panel/surveys/new" style={{ fontSize: 13, fontWeight: 700, color: "var(--primary)", textDecoration: "none" }}>+ İlk anketi oluştur</Link>
+          <Link href="/yonetim/surveys/new" style={{ fontSize: 13, fontWeight: 700, color: "var(--primary)", textDecoration: "none" }}>+ İlk anketi oluştur</Link>
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(380px,1fr))", gap: 16 }}>
@@ -59,13 +59,13 @@ export default async function SurveysPage() {
                   )}
                 </div>
                 <div style={{ display: "flex", gap: 4 }}>
-                  <Link href={`/panel/surveys/${survey.id}`}
+                  <Link href={`/yonetim/surveys/${survey.id}`}
                     style={{ padding: 6, borderRadius: 10, color: "var(--muted)", display: "grid", placeItems: "center", transition: "all 0.18s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "rgba(108,99,255,0.08)"; (e.currentTarget as HTMLElement).style.color = "var(--accent)"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}>
                     <Edit style={{ width: 15, height: 15 }} />
                   </Link>
-                  <Link href={`/panel/surveys/${survey.id}/results`}
+                  <Link href={`/yonetim/surveys/${survey.id}/results`}
                     style={{ padding: 6, borderRadius: 10, color: "var(--muted)", display: "grid", placeItems: "center", transition: "all 0.18s" }}
                     onMouseEnter={e => { e.currentTarget.style.background = "rgba(27,154,170,0.08)"; (e.currentTarget as HTMLElement).style.color = "var(--primary)"; }}
                     onMouseLeave={e => { e.currentTarget.style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}

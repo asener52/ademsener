@@ -12,23 +12,23 @@ const navGroups = [
   {
     label: "Genel",
     items: [
-      { href: "/panel/dashboard",  label: "Dashboard",    icon: LayoutDashboard },
-      { href: "/panel/messages",   label: "Mesajlar",     icon: MessageSquare },
+      { href: "/yonetim/dashboard",  label: "Dashboard",    icon: LayoutDashboard },
+      { href: "/yonetim/messages",   label: "Mesajlar",     icon: MessageSquare },
     ],
   },
   {
     label: "İçerik",
     items: [
-      { href: "/panel/posts",      label: "Yazılar",      icon: FileText },
-      { href: "/panel/events",     label: "Etkinlikler",  icon: Calendar },
-      { href: "/panel/surveys",    label: "Anketler",     icon: ClipboardList },
+      { href: "/yonetim/posts",      label: "Yazılar",      icon: FileText },
+      { href: "/yonetim/events",     label: "Etkinlikler",  icon: Calendar },
+      { href: "/yonetim/surveys",    label: "Anketler",     icon: ClipboardList },
     ],
   },
   {
     label: "Yönetim",
     items: [
-      { href: "/panel/newsletter", label: "Bülten",       icon: Mail },
-      { href: "/panel/about",      label: "Hakkımda",     icon: User },
+      { href: "/yonetim/newsletter", label: "Bülten",       icon: Mail },
+      { href: "/yonetim/about",      label: "Hakkımda",     icon: User },
     ],
   },
 ];
@@ -39,7 +39,7 @@ export function AdminSidebar() {
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/panel/login");
+    router.push("/yonetim/login");
     router.refresh();
   };
 

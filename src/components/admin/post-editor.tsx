@@ -38,7 +38,7 @@ export function PostEditor({ post, mode }: { post?: Post; mode: "create" | "edit
     const method = mode === "create" ? "POST" : "PUT";
     const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
     setSaving(false);
-    if (res.ok) { router.push("/panel/posts"); router.refresh(); }
+    if (res.ok) { router.push("/yonetim/posts"); router.refresh(); }
     else setError("Kaydedilemedi, tekrar deneyin.");
   };
 

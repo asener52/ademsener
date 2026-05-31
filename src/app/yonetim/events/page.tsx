@@ -52,7 +52,7 @@ function EventCard({ ev }: { ev: any }) {
             )}
           </div>
           <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
-            <Link href={`/panel/events/${ev.id}`}
+            <Link href={`/yonetim/events/${ev.id}`}
               style={{ padding: 6, borderRadius: 10, color: "var(--muted)", display: "grid", placeItems: "center", transition: "all 0.18s" }}
               onMouseEnter={e => { e.currentTarget.style.background = "rgba(108,99,255,0.08)"; (e.currentTarget as HTMLElement).style.color = "var(--accent)"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "transparent"; (e.currentTarget as HTMLElement).style.color = "var(--muted)"; }}>
@@ -91,7 +91,7 @@ export default async function EventsPage() {
           <h1 style={{ fontSize: 32, fontWeight: 900, letterSpacing: "-1.5px", color: "var(--text)" }}>Etkinlikler</h1>
           <p style={{ fontSize: 14, color: "var(--muted)", marginTop: 4 }}>{events.length} etkinlik · {upcoming.length} yaklaşan</p>
         </div>
-        <Link href="/panel/events/new"
+        <Link href="/yonetim/events/new"
           style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 22px", borderRadius: 16, fontSize: 14, fontWeight: 800, textDecoration: "none", color: "#fff", background: "linear-gradient(135deg,var(--primary),var(--secondary))", boxShadow: "0 10px 24px rgba(27,154,170,0.28)" }}>
           <Plus style={{ width: 16, height: 16 }} /> Yeni Etkinlik
         </Link>
@@ -101,7 +101,7 @@ export default async function EventsPage() {
         <div style={{ textAlign: "center", padding: "64px 24px", background: "rgba(255,255,255,0.76)", border: "1px solid rgba(255,255,255,0.86)", borderRadius: 24, boxShadow: "0 12px 28px rgba(31,90,110,0.08)" }}>
           <Calendar style={{ width: 48, height: 48, color: "rgba(22,48,64,0.12)", margin: "0 auto 14px" }} />
           <p style={{ fontWeight: 700, color: "var(--text)", marginBottom: 10 }}>Henüz etkinlik yok</p>
-          <Link href="/panel/events/new" style={{ fontSize: 13, fontWeight: 700, color: "var(--primary)", textDecoration: "none" }}>+ İlk etkinliği oluştur</Link>
+          <Link href="/yonetim/events/new" style={{ fontSize: 13, fontWeight: 700, color: "var(--primary)", textDecoration: "none" }}>+ İlk etkinliği oluştur</Link>
         </div>
       ) : (
         <>

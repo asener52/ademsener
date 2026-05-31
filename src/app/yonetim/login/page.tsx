@@ -22,7 +22,7 @@ export default function AdminLoginPage() {
       body: JSON.stringify({ email, password }),
     });
     if (res.ok) {
-      router.push("/panel/dashboard");
+      router.push("/yonetim/dashboard");
       router.refresh();
     } else {
       setError("E-posta veya şifre hatalı.");

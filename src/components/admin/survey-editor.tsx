@@ -83,7 +83,7 @@ export function SurveyEditor({ survey }: { survey?: SurveyData | null }) {
       const method = survey?.id ? "PUT" : "POST";
       const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       if (!res.ok) throw new Error(await res.text());
-      router.push("/panel/surveys");
+      router.push("/yonetim/surveys");
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Bir hata oluştu");
@@ -230,7 +230,7 @@ export function SurveyEditor({ survey }: { survey?: SurveyData | null }) {
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {survey?.id ? "Güncelle" : "Kaydet"}
         </button>
-        <a href="/panel/surveys" className="px-6 py-3 rounded-xl text-sm font-bold"
+        <a href="/yonetim/surveys" className="px-6 py-3 rounded-xl text-sm font-bold"
           style={{ color: "#64748b", border: "1px solid #e2e8f0" }}>
           İptal
         </a>
