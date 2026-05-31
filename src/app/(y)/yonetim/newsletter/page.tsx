@@ -1,6 +1,6 @@
 import { query } from "@/lib/db";
-import { Mail, Users, Calendar } from "lucide-react";
-import { formatDate } from "@/lib/utils";
+import { Users } from "lucide-react";
+import { NewsletterList } from "@/components/admin/newsletter-list";
 
 export default async function NewsletterPage() {
   const subscribers = await query<any>("SELECT * FROM newsletter_subscribers ORDER BY created_at DESC");
@@ -31,28 +31,7 @@ export default async function NewsletterPage() {
           <span>E-posta</span>
           <span>Kayıt Tarihi</span>
         </div>
-        <div>
-          {subscribers?.map((sub) => (
-            <div key={sub.id} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: "13px 24px", alignItems: "center", borderBottom: "1px solid rgba(22,48,64,0.04)", transition: "background 0.18s" }}
-              onMouseEnter={e => (e.currentTarget.style.background = "rgba(27,154,170,0.03)")}
-              onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <Mail style={{ width: 15, height: 15, color: "var(--muted)", flexShrink: 0 }} />
-                <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{sub.email}</span>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--muted)" }}>
-                <Calendar style={{ width: 13, height: 13 }} />
-                {formatDate(sub.created_at)}
-              </div>
-            </div>
-          ))}
-          {(!subscribers || subscribers.length === 0) && (
-            <div style={{ textAlign: "center", padding: "48px 24px" }}>
-              <Mail style={{ width: 36, height: 36, color: "rgba(22,48,64,0.12)", margin: "0 auto 10px" }} />
-              <p style={{ fontSize: 13, color: "var(--muted)" }}>Henüz abone yok.</p>
-            </div>
-          )}
-        </div>
+        <NewsletterList subscribers={subscribers} />
       </div>
     </div>
   );
