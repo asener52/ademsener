@@ -289,7 +289,7 @@ export function PublicApp() {
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {articles.map((post) => (
-                <div key={post.id} className="article-card">
+                <a key={post.id} href={`/articles/${post.slug}`} className="article-card" style={{ textDecoration: "none", display: "block", cursor: "pointer" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                     <span style={{ fontSize: 11, fontWeight: 800, padding: "3px 10px", borderRadius: 8, color: "white", background: typeColor[post.type] || "#1b9aaa" }}>
                       {typeLabel[post.type] || post.type}
@@ -307,7 +307,7 @@ export function PublicApp() {
                       {post.tags.map(t => <span key={t} className="tag">{t}</span>)}
                     </div>
                   )}
-                </div>
+                </a>
               ))}
             </div>
           )}
