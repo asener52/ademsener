@@ -1,20 +1,30 @@
 import mysql from "mysql2/promise";
 
-// Pool'u lazy oluştur — import sırasında değil, ilk sorguda
 let _pool: mysql.Pool | null = null;
 
 function getPool(): mysql.Pool {
   if (!_pool) {
-    _pool = mysql.createPool({
-      host:               process.env.DB_HOST     || "127.0.0.1",
+    // Hostinger'da MySQL socket path'ini dene, yoksa TCP ile bağlan
+    const socketPath = process.env.DB_SOCKET; // örn: /var/run/mysqld/mysqld.sock
+
+    const config: mysql.PoolOptions = {
       user:               process.env.DB_USER     || "u345143959_ademsener",
       password:           process.env.DB_PASSWORD || "",
       database:           process.env.DB_NAME     || "u345143959_ademsener",
-      port:               Number(process.env.DB_PORT) || 3306,
       waitForConnections: true,
       connectionLimit:    10,
       charset:            "utf8mb4",
-    });
+    };
+
+    if (socketPath) {
+      // Unix socket bağlantısı (host gerekmez)
+      config.socketPath = socketPath;
+    } else {
+      config.host = process.env.DB_HOST || "localhost";
+      config.port = Number(process.env.DB_PORT) || 3306;
+    }
+
+    _pool = mysql.createPool(config);
   }
   return _pool;
 }
