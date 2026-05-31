@@ -5,7 +5,7 @@ const SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "ademsener-super-secret-jwt-key-change-in-prod"
 );
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Admin rotaları — login hariç oturum kontrolü
@@ -25,7 +25,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/admin/:path*"],
 };
