@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { slugify } from "@/lib/utils";
-import { Save, Eye, EyeOff, ArrowLeft, Star, Globe, Loader2 } from "lucide-react";
+import { Save, Eye, EyeOff, ArrowLeft, Star, Loader2 } from "lucide-react";
+import { ImageUpload } from "@/components/admin/image-upload";
 
 interface Post { id?: string; title?: string; slug?: string; excerpt?: string; content?: string; cover_image?: string; type?: string; tags?: string[]; published?: boolean; featured?: boolean; }
 
@@ -130,7 +131,7 @@ export function PostEditor({ post, mode }: { post?: Post; mode: "create" | "edit
           <div style={card}>
             <p style={{ fontWeight: 800, fontSize: 13, color: "var(--text)", marginBottom: 14 }}>Meta</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              <div><label style={lbl}>Kapak Görseli URL</label><input type="url" style={inp} value={form.cover_image} onChange={e => setForm(f => ({ ...f, cover_image: e.target.value }))} placeholder="https://..." /></div>
+              <ImageUpload value={form.cover_image} onChange={url => setForm(f => ({ ...f, cover_image: url }))} />
               <div><label style={lbl}>Etiketler (virgülle)</label><input style={inp} value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))} placeholder="cbs, gis, harita" /></div>
             </div>
           </div>
