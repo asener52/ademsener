@@ -117,6 +117,22 @@ export async function GET() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     `);
 
+    await query(`
+      CREATE TABLE IF NOT EXISTS downloads (
+        id             CHAR(36)     NOT NULL DEFAULT (UUID()),
+        title          VARCHAR(500) NOT NULL,
+        description    TEXT,
+        filename       VARCHAR(500) NOT NULL,
+        original_name  VARCHAR(500) NOT NULL,
+        file_size      BIGINT       NOT NULL DEFAULT 0,
+        file_type      VARCHAR(100),
+        download_count INT          NOT NULL DEFAULT 0,
+        created_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (id)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+    `);
+
     return NextResponse.json({ ok: true, message: "Tüm tablolar oluşturuldu." });
   } catch (err: any) {
     return NextResponse.json({ ok: false, error: err?.message || String(err) }, { status: 500 });

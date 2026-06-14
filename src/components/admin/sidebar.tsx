@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   MapPin, LayoutDashboard, FileText, MessageSquare, User,
-  LogOut, ChevronRight, Mail, Calendar, ClipboardList,
+  LogOut, ChevronRight, Mail, Calendar, ClipboardList, Download,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,7 @@ const navGroups = [
       { href: "/yonetim/posts",      label: "Yazılar",      icon: FileText },
       { href: "/yonetim/events",     label: "Etkinlikler",  icon: Calendar },
       { href: "/yonetim/surveys",    label: "Anketler",     icon: ClipboardList },
+      { href: "/yonetim/downloads",  label: "İndirmeler",   icon: Download },
     ],
   },
   {
